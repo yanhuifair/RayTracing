@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
-
-[ExecuteInEditMode]
-[ImageEffectAllowedInSceneView]
 public class RayTracingCamera : Singleton<RayTracingCamera>
     {
 
@@ -100,7 +97,7 @@ public class RayTracingCamera : Singleton<RayTracingCamera>
                     var sphere = new SphereInfo();
                     sphere.position = item.transform.position;
                     sphere.rotation = item.transform.rotation.eulerAngles;
-                    sphere.radius = item.radius;
+                    sphere.radius = item.radius / 2.0f;
                     sphere.albedo = ColorToVector3(item.albedo);
                     sphere.specular = ColorToVector3(item.specular);
                     sphere.smoothness = item.smoothness;
@@ -209,13 +206,10 @@ public class RayTracingCamera : Singleton<RayTracingCamera>
             }
         }
 
-        private void Awake()
-        {
-            _camera = GetComponent<Camera>();
-        }
-
         void SetShaderParameters()
         {
+            if (_camera == null) _camera = GetComponent<Camera>();
+
             RayTracingShader.SetMatrix("_CameraToWorld", _camera.cameraToWorldMatrix);
             RayTracingShader.SetMatrix("_CameraInverseProjection", _camera.projectionMatrix.inverse);
 
@@ -241,6 +235,7 @@ public class RayTracingCamera : Singleton<RayTracingCamera>
             SetComputeBuffer("_Vertices", _vertexBuffer);
             SetComputeBuffer("_Indices", _indexBuffer);
             RayTracingShader.SetInt("_numMeshObjects", _meshObjectBuffer.count);
+            RayTracingShader.SetFloat("_CameraFar", _camera.farClipPlane);
         }
         private void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
@@ -254,8 +249,8 @@ public class RayTracingCamera : Singleton<RayTracingCamera>
         {
             InitRenderTexture();
             RayTracingShader.SetTexture(0, "Result", renderTexture);
-            int threadGroupsX = Mathf.CeilToInt(Screen.width / 16);
-            int threadGroupsY = Mathf.CeilToInt(Screen.height / 16);
+            int threadGroupsX = Mathf.CeilToInt(Screen.width / 8);
+            int threadGroupsY = Mathf.CeilToInt(Screen.height / 8);
             RayTracingShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
 
             if (cover)
@@ -304,17 +299,5 @@ public class RayTracingCamera : Singleton<RayTracingCamera>
                 renderTextureCover.enableRandomWrite = true;
                 renderTextureCover.Create();
             }
-        }
-        // Start is called before the first frame update
-        void Start() {}
-
-        // Update is called once per frame
-        void Update()
-        {
-            // if (transform.hasChanged)
-            // {
-            //     currentSample = 0;
-            //     transform.hasChanged = false;
-            // }
         }
     }
