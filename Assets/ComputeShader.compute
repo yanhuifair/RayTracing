@@ -371,7 +371,7 @@ void CSMain(uint3 id: SV_DispatchThreadID)
     uint marchAdd = 0;
     for (i = 0; i < cycle; i ++)
     {
-        float3  currentPos = rayMarching.origin +
+        float3 currentPos = rayMarching.origin +
         rayMarching.direction * (fristInpatchDistance * rand());
         
         Ray r = CreateRay(currentPos, SampleGlobalsphere());

@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
-[ExecuteInEditMode]
 
 public class RayTracingEntity : MonoBehaviour
 {
     public enum EntityType
     {
-        Sphere,
         Mesh,
+        Sphere,
     }
 
     [EnumToggleButtons] public EntityType entityType;
