@@ -14,7 +14,6 @@ static const float PI = 3.14159265f;
 static const float EPSILON = 1e-8;
 
 float2 _PixelOffset;
-float4 _DirectionalLight;
 
 float3 _ScreenSize;
 uint _depth;
@@ -276,19 +275,6 @@ RayHit Trace(Ray ray)
     return bestHit;
 }
 
-float3 Shadow(RayHit hit)
-{
-    // Shadow
-    bool shadow = false;
-    Ray shadowRay = CreateRay(hit.position + hit.normal * 0.001f, -1 * _DirectionalLight.xyz);
-    RayHit shadowHit = Trace(shadowRay);
-    if (shadowHit.distance != 1.#INF)
-    {
-        return float3(0.5f, 0.5f, 0.5f);
-    }
-    return float3(1, 1, 1);
-}
-
 float sdot(float3 x, float3 y, float f = 1.0f)
 {
     return saturate(dot(x, y) * f);
@@ -303,7 +289,7 @@ float SmoothnessToPhongAlpha(float s)
 }
 float3 Shade(inout Ray ray, RayHit hit)
 {
-    if(hit.hited)
+    if (hit.hited)
     {
         hit.albedo = min(1.0f - hit.specular, hit.albedo);
         float specChance = energy(hit.specular);
@@ -392,7 +378,7 @@ void CSMain(uint3 id: SV_DispatchThreadID)
         RayHit hit = Trace(r);
         if(hit.hited)
         {
-            marchingColor += hit.emission * r.energy * 2;
+            marchingColor += hit.emission * r.energy * 10;
             marchAdd += 1;
         }
     }

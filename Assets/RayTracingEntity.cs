@@ -1,18 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 [ExecuteInEditMode]
 
-public enum EntityType
-{
-    Sphere,
-    Plane,
-    Mesh,
-}
 public class RayTracingEntity : MonoBehaviour
 {
-    public EntityType entityType;
+    public enum EntityType
+    {
+        Sphere,
+        Mesh,
+    }
+
+    [EnumToggleButtons] public EntityType entityType;
     [Header("Sphere")]
     public float radius = 1;
 
