@@ -10,6 +10,7 @@ public class RayTracingCamera : MonoBehaviour
 
     public ComputeShader RayTracingShader;
     [Range(1, 10)] public int depth = 3;
+    [Range(1, 10)] public int sample = 1;
     public Texture2D _SkyboxTexture;
     RenderTexture renderTexture;
     RenderTexture renderTextureCover;
@@ -28,7 +29,7 @@ public class RayTracingCamera : MonoBehaviour
     ComputeBuffer sphereBuffer;
     public List<SphereInfo> spheres = new List<SphereInfo>();
     public bool cover;
-    public uint currentSample = 0;
+    public int currentSample = 0;
     private Material addMaterial;
     //mesh 
     struct MeshObject
@@ -42,6 +43,8 @@ public class RayTracingCamera : MonoBehaviour
         public float smoothness;
         public Vector3 emission;
     };
+
+    public List<RayTracingEntity> RayTracingEntities = new List<RayTracingEntity>();
     private static List<MeshObject> _meshObjects = new List<MeshObject>();
     private static List<Vector3> _vertices = new List<Vector3>();
     private static List<int> _indices = new List<int>();
@@ -89,8 +92,7 @@ public class RayTracingCamera : MonoBehaviour
     void SetSpheres()
     {
         spheres.Clear();
-        var entitys = GameObject.FindObjectsOfType(typeof(RayTracingEntity)) as RayTracingEntity[];
-        foreach (var item in entitys)
+        foreach (var item in RayTracingEntities)
         {
             if (item.entityType == RayTracingEntity.EntityType.Sphere && item.gameObject.activeSelf == true)
             {
@@ -129,9 +131,7 @@ public class RayTracingCamera : MonoBehaviour
         _vertices.Clear();
         _indices.Clear();
 
-        // Loop over all objects and gather their data
-        var entitys = GameObject.FindObjectsOfType(typeof(RayTracingEntity)) as RayTracingEntity[];
-        foreach (RayTracingEntity obj in entitys)
+        foreach (RayTracingEntity obj in RayTracingEntities)
         {
             if (obj.entityType != RayTracingEntity.EntityType.Mesh) continue;
             MeshFilter meshFilter = obj.gameObject.GetComponent<MeshFilter>();
@@ -154,13 +154,13 @@ public class RayTracingCamera : MonoBehaviour
             _meshObjects.Add(new MeshObject()
             {
                 localToWorldMatrix = obj.transform.localToWorldMatrix,
-                indices_offset = firstIndex,
-                indices_count = indices.Length,
+                    indices_offset = firstIndex,
+                    indices_count = indices.Length,
 
-                albedo = ColorToVector3(obj.albedo),
-                specular = ColorToVector3(obj.specular),
-                smoothness = obj.smoothness,
-                emission = ColorToVector3(obj.emission),
+                    albedo = ColorToVector3(obj.albedo),
+                    specular = ColorToVector3(obj.specular),
+                    smoothness = obj.smoothness,
+                    emission = ColorToVector3(obj.emission),
             });
         }
         unsafe
@@ -222,6 +222,7 @@ public class RayTracingCamera : MonoBehaviour
         RayTracingShader.SetBuffer(0, "_Spheres", sphereBuffer);
         RayTracingShader.SetInt("_numSpheres", sphereBuffer.count);
         RayTracingShader.SetInt("_depth", depth);
+        RayTracingShader.SetInt("_sample", sample);
         RayTracingShader.SetFloat("_Seed", UnityEngine.Random.value);
 
         //mesh
@@ -265,10 +266,24 @@ public class RayTracingCamera : MonoBehaviour
 
     void InitRenderTexture()
     {
-        Vector2Int texSize = new Vector2Int((int)Screen.width, (int)Screen.height);
+        Vector2Int texSize = Vector2Int.zero;
+        if (Application.isPlaying)
+        {
+            texSize = new Vector2Int((int) Screen.width, (int) Screen.height);
+        }
+        else
+        {
+            GameObject sceneCamObj = GameObject.Find("SceneCamera");
+            if (sceneCamObj != null)
+            {
+                var rect = sceneCamObj.GetComponent<Camera>().pixelRect;
+                texSize = new Vector2Int((int) rect.width, (int) rect.height);
+            }
+        }
+
         if (renderTexture == null
-            || renderTexture.width != Screen.width
-            || renderTexture.height != Screen.height)
+            || renderTexture.width != texSize.x
+            || renderTexture.height != texSize.y)
         {
             if (renderTexture != null)
             {
@@ -277,12 +292,11 @@ public class RayTracingCamera : MonoBehaviour
             renderTexture = new RenderTexture(texSize.x, texSize.y, 0, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.Linear);
             renderTexture.enableRandomWrite = true;
             renderTexture.Create();
-
         }
 
         if (renderTextureCover == null
-            || renderTextureCover.width != Screen.width
-            || renderTextureCover.height != Screen.height)
+            || renderTextureCover.width != texSize.x
+            || renderTextureCover.height != texSize.y)
         {
             if (renderTextureCover != null)
             {

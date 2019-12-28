@@ -4,17 +4,32 @@ using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class RayTracingEntity : MonoBehaviour
 {
     public enum EntityType
     {
         Mesh,
+        Fog,
         Sphere,
+    }
+    private void OnEnable()
+    {
+        var list = GameObject.FindObjectOfType<RayTracingCamera>().RayTracingEntities;
+        if (!list.Contains(this))
+            list.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        var list = GameObject.FindObjectOfType<RayTracingCamera>().RayTracingEntities;
+        if (list.Contains(this))
+            list.Remove(this);
     }
 
     [EnumToggleButtons] public EntityType entityType;
     [Header("Sphere")]
-    public float radius = 1;
+    [ShowIf("entityType", EntityType.Sphere)] public float radius = 1;
 
     [Header("Render")]
     [ColorUsageAttribute(false, false)] public Color albedo = Color.gray;

@@ -17,6 +17,7 @@ float2 _PixelOffset;
 
 float3 _ScreenSize;
 uint _depth;
+uint _sample;
 float _CameraFar;
 
 struct Sphere
@@ -364,6 +365,7 @@ void CSMain(uint3 id: SV_DispatchThreadID)
             break;
         }
     }
+    sceneColor /= _sample;
     
     Ray rayMarching = ray;
     float3 marchingColor = float3(0, 0, 0);
