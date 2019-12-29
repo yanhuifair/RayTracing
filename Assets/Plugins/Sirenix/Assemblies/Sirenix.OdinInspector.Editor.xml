@@ -130,30 +130,6 @@
             Gets the current running version of Odin Inspector.
             </summary>
         </member>
-        <member name="T:Sirenix.OdinInspector.Editor.UnityEditorEventUtility">
-            <summary>
-            Sometimes, an idiot overrides a delay action subscription to <see cref="F:UnityEditor.EditorApplication.delayCall"/>,
-            which can be done because the people at Unity didn't know what events were once upon a time.
-            This method subscribes to a lot of different callbacks, in the hopes of catching at least one.
-            </summary>
-        </member>
-        <member name="M:Sirenix.OdinInspector.Editor.UnityEditorEventUtility.DelayActionThreadSafe(System.Action)">
-            <summary>
-            Sometimes, an idiot overrides a delay action subscription to <see cref="F:UnityEditor.EditorApplication.delayCall"/>,
-            which can be done because the people at Unity didn't know what events were once upon a time.
-            This method subscribes to a lot of different callbacks, in the hopes of catching at least one.
-            <para />
-            As opposed to <see cref="M:Sirenix.OdinInspector.Editor.UnityEditorEventUtility.DelayAction(System.Action)"/>, this method is safe to call from any thread, and will
-            delay the actual subscription to a safe time.
-            </summary>
-        </member>
-        <member name="M:Sirenix.OdinInspector.Editor.UnityEditorEventUtility.DelayAction(System.Action)">
-            <summary>
-            Sometimes, an idiot overrides a delay action subscription to <see cref="F:UnityEditor.EditorApplication.delayCall"/>,
-            which can be done because the people at Unity didn't know what events were once upon a time.
-            This method subscribes to a lot of different callbacks, in the hopes of catching at least one.
-            </summary>
-        </member>
         <member name="T:Sirenix.OdinInspector.Editor.PrefabModificationHandler">
             <summary>
             <para>Handles all prefab modifications that apply to the targets of a property tree, if any. This class determines which properties have modifications, what the modifications are, auto-applies modifications if the current instance values do not correspond to the prefab values, and also provides an API for modifying those modifications.</para>
@@ -3640,6 +3616,11 @@
             The global offset of the menu item content
             </summary>
         </member>
+        <member name="F:Sirenix.OdinInspector.Editor.OdinMenuStyle.LabelVerticalOffset">
+            <summary>
+            The vertical offset of the menu item label
+            </summary>
+        </member>
         <member name="F:Sirenix.OdinInspector.Editor.OdinMenuStyle.IndentAmount">
             <summary>
             The number of pixels to indent per level indent level.
@@ -4954,6 +4935,11 @@
         <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.ExpandFoldoutByDefault">
             <summary>
             If set to true, most foldouts throughout the inspector will be expanded by default.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.ShowButtonResultsByDefault">
+            <summary>
+            If set to true, buttons will show the result values from invoking them in the inspector by default.
             </summary>
         </member>
         <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.GUIFoldoutAnimationDuration">

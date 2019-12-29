@@ -154,13 +154,13 @@ public class RayTracingCamera : MonoBehaviour
             _meshObjects.Add(new MeshObject()
             {
                 localToWorldMatrix = obj.transform.localToWorldMatrix,
-                indices_offset = firstIndex,
-                indices_count = indices.Length,
+                    indices_offset = firstIndex,
+                    indices_count = indices.Length,
 
-                albedo = ColorToVector3(obj.albedo),
-                specular = ColorToVector3(obj.specular),
-                smoothness = obj.smoothness,
-                emission = ColorToVector3(obj.emission),
+                    albedo = ColorToVector3(obj.albedo),
+                    specular = ColorToVector3(obj.specular),
+                    smoothness = obj.smoothness,
+                    emission = ColorToVector3(obj.emission),
             });
         }
         unsafe
@@ -265,7 +265,7 @@ public class RayTracingCamera : MonoBehaviour
 
     void InitRenderTexture()
     {
-        Vector2Int texSize = new Vector2Int((int)Screen.width, (int)Screen.height);
+        Vector2Int texSize = new Vector2Int((int) Screen.width, (int) Screen.height);
         if (renderTexture == null
             || renderTexture.width != Screen.width
             || renderTexture.height != Screen.height)
