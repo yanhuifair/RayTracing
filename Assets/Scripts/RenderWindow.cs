@@ -6,14 +6,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class RenderWindow : EditorWindow
 {
-    ComputeShader RayTracingComputeShader;
-    int SamplePerPixel;
-    int depth;
-    Vector2Int resolution = new Vector2Int(1280, 720);
-    Texture2D skyBoxTexture;
-    RenderTexture renderTexture;
-    Camera _camera;
-    Camera CameraCurrent
+    static ComputeShader RayTracingComputeShader;
+    static int SamplePerPixel;
+    static int depth = 3;
+    static Vector2Int resolution = new Vector2Int(1280, 720);
+    static Texture2D skyBoxTexture;
+    static RenderTexture renderTexture;
+    static Camera _camera;
+    static Camera CameraCurrent
     {
         get
         {
@@ -23,42 +23,46 @@ public class RenderWindow : EditorWindow
             }
             else
             {
-                // _camera = GameObject.Find("SceneCamera").GetComponent<Camera>();
                 _camera = SceneView.lastActiveSceneView.camera;
             }
             return _camera;
         }
     }
 
-    RayTracingSystem rayTracingSystem = new RayTracingSystem();
+    static RayTracingSystem rayTracingSystem = new RayTracingSystem();
 
-    RenderWindow window;
+    static RenderWindow window;
+    static RenderWindow WINDOW
+    {
+        get
+        {
+            if (window == null) window = (RenderWindow) EditorWindow.GetWindow(typeof(RenderWindow));
+            return window;
+        }
+    }
+
     [MenuItem("Ray Tracing/Render Window")]
     static void Init()
     {
-        // Get existing open window or if none, make a new one:
-        RenderWindow window = (RenderWindow) EditorWindow.GetWindow(typeof(RenderWindow));
-        window.Show();
+        WINDOW.Show();
     }
 
     private void OnEnable()
     {
+        Debug.Log("OnEnable");
+        timeAdd = 0;
         EditorApplication.update += Upadte;
     }
 
     private void OnDisable()
     {
+        Debug.Log("OnDisable");
         EditorApplication.update -= Upadte;
         rayTracingSystem.Release();
     }
 
     void OnGUI()
     {
-        RayTracingComputeShader = EditorGUILayout.ObjectField("ComputeShader", RayTracingComputeShader, typeof(ComputeShader), false) as ComputeShader;
-        skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", skyBoxTexture, typeof(Object), false) as Texture2D;
-        SamplePerPixel = EditorGUILayout.IntSlider("SamplePerPixel", SamplePerPixel, 1, 10);
-        depth = EditorGUILayout.IntSlider("Depth", depth, 1, 10);
-        resolution = EditorGUILayout.Vector2IntField("Resolution", resolution);
 
         if (renderTexture)
         {
@@ -66,35 +70,53 @@ public class RenderWindow : EditorWindow
             var TextureRect = new Rect(0, position.height - position.width / ratio, position.width, position.width / ratio);
             EditorGUI.DrawPreviewTexture(TextureRect, renderTexture);
         }
-        EditorGUILayout.ObjectField("SkyBox Texture", renderTexture, typeof(Object), true);
+
+        RayTracingComputeShader = EditorGUILayout.ObjectField("ComputeShader", RayTracingComputeShader, typeof(ComputeShader), false) as ComputeShader;
+        skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", skyBoxTexture, typeof(Object), false) as Texture2D;
+        SamplePerPixel = EditorGUILayout.IntSlider("SamplePerPixel", SamplePerPixel, 1, 10);
+        depth = EditorGUILayout.IntSlider("Depth", depth, 1, 10);
+        resolution = EditorGUILayout.Vector2IntField("Resolution", resolution);
 
         GUILayout.BeginHorizontal();
         EditorGUILayout.LabelField(rayTracingSystem.layerCount.ToString());
+        EditorGUILayout.LabelField(timeAdd.ToString());
+        EditorGUILayout.LabelField(timeMax.ToString());
         if (GUILayout.Button("Reset"))
         {
             rayTracingSystem.needReset += 1;
         }
         GUILayout.EndHorizontal();
 
-        if (GUILayout.RepeatButton("Interation"))
+        if (GUILayout.RepeatButton("Interation", GUILayout.Height(30)))
         {
             Interation();
         }
     }
 
-    UnityEngine.Vector3 positionLast;
-    UnityEngine.Quaternion quaternionLast;
-    Vector3 lastSize;
-    void Upadte()
+    static UnityEngine.Vector3 positionLast;
+    static UnityEngine.Quaternion quaternionLast;
+    static Vector3 lastSize;
+
+    static float timeMax = 0.1f;
+    static float timeAdd;
+    static void Upadte()
     {
         resolution = new Vector2Int(
             (int) SceneView.lastActiveSceneView.position.width,
             (int) SceneView.lastActiveSceneView.position.height);
+
         if (!lastSize.IsApproximate(new Vector3(resolution.x, resolution.y, 0), 1))
         {
             lastSize = new Vector3(resolution.x, resolution.y, 0);
             rayTracingSystem.needReset += 1;
         }
+
+        // timeAdd += 1 / 100.0f;
+        // if (timeAdd >= timeMax)
+        // {
+        //     timeAdd = 0;
+        //     Interation();
+        // }
     }
 
     void AngChanged()
@@ -102,8 +124,9 @@ public class RenderWindow : EditorWindow
 
     }
 
-    void Interation()
+    static void Interation()
     {
+
         if (CameraCurrent != null && RayTracingComputeShader != null)
         {
             if (!CameraCurrent.transform.position.IsApproximate(positionLast, 0.001f)

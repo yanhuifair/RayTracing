@@ -1,0 +1,69 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+float4 setting;
+int spaceSize;
+int stateMax;
+
+struct Cell
+{
+    int state;
+    float x;
+    float y;
+    float z;
+};
+RWStructuredBuffer<Cell> cell;
+RWStructuredBuffer<Cell> cellOut;
+
+int GetIndex(uint3 id)
+{
+    int index = id.z * (spaceSize * spaceSize) + id.y * spaceSize + id.x;
+    return index;
+}
+
+
+[numthreads(8, 8, 8)]
+void CSMain(uint3 id: SV_DispatchThreadID)
+{
+    
+    int3 i3[26] = {
+        uint3(0, 1, 1), uint3(1, 1, 1), uint3(1, 1, 0), uint3(1, 1, -1), uint3(0, 1, -1), uint3(-1, 1, -1), uint3(-1, 1, 0), uint3(-1, 1, 1), uint3(0, 1, 0),
+        uint3(0, 0, 1), uint3(1, 0, 1), uint3(1, 0, 0), uint3(1, 0, -1), uint3(0, 0, -1), uint3(-1, 0, -1), uint3(-1, 0, 0), uint3(-1, 0, 1),
+        uint3(0, -1, 1), uint3(1, -1, 1), uint3(1, -1, 0), uint3(1, -1, -1), uint3(0, -1, -1), uint3(-1, -1, -1), uint3(-1, -1, 0), uint3(-1, -1, 1), uint3(0, -1, 0),
+    };
+    
+    int s = 0;
+    for (int i = 0; i < 26; i ++)
+    {
+        int3 cid = id + i3[i];
+        if (cid.x >= spaceSize)cid.x -= spaceSize;
+        if(cid.y >= spaceSize)cid.y -= spaceSize;
+        if(cid.z >= spaceSize)cid.z -= spaceSize;
+        
+        int cindex = GetIndex(cid);
+        if(cell[cindex].state > 0)
+        {
+            s += 1;
+        }
+    }
+    
+    
+    int index = GetIndex(id);
+    
+    //Survive
+    if (s < setting.x || s > setting.y)
+    {
+        if(cell[index].state > 0)
+        {
+            cellOut[index].state -= 1;
+        }
+    }
+    
+    //Rebirth
+    if (s >= setting.z && s <= setting.w)
+    {
+        if(cell[index].state <= 0)
+        {
+            cellOut[index].state = stateMax;
+        }
+    }
+}

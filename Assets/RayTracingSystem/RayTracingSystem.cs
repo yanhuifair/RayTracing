@@ -154,6 +154,7 @@ public class RayTracingSystem
     //Box
     public struct BoxInfo
     {
+        public Matrix4x4 localToWorldMatrix;
         public Vector3 position;
         public Vector3 rotation;
         public Vector3 size;
@@ -172,6 +173,8 @@ public class RayTracingSystem
             if (item.entityType == RayTracingEntity.EntityType.Box && item.gameObject.activeSelf == true)
             {
                 var box = new BoxInfo();
+                Matrix4x4 matrix4X4 = Matrix4x4.TRS(item.transform.position, item.transform.rotation, item.transform.lossyScale);
+                box.localToWorldMatrix = matrix4X4;
                 box.position = item.transform.position;
                 box.rotation = item.transform.rotation.eulerAngles;
                 box.size = item.boxSize;

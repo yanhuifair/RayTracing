@@ -38,6 +38,7 @@ uint _numSpheres;
 
 struct Box
 {
+    float4x4 localToWorldMatrix;
     float3 position;
     float3 rotation;
     float3 size;
@@ -176,6 +177,14 @@ void IntersectSphere(Ray ray, inout RayHit hit, Sphere sphere)
 // axis aligned box centered at the origin, with size boxSize
 void IntersectionBox(Ray ray, inout RayHit hit, Box box)
 {
+    // box.position = mul(box.localToWorldMatrix, box.position);
+    // box.rotation = mul(box.localToWorldMatrix, box.rotation);
+    //box.size = mul(box.localToWorldMatrix, box.size);
+    
+    //ray.origin = mul(box.localToWorldMatrix, ray.origin);
+    //ray.direction = mul(box.localToWorldMatrix, ray.direction);
+    
+    
     float3 ro = ray.origin;
     float3 rd = ray.direction;
     float3 m = 1.0 / rd; // can precompute if traversing a set of aligned boxes
@@ -371,11 +380,11 @@ float3 Shade(inout Ray ray, RayHit hit)
             ray.direction = SampleHemisphere(hit.normal, 1.0f);
             ray.energy *= (1.0f / diffChance) * hit.albedo;
         }
-        return hit.emission ;
+        return hit.emission;
     }
     else
     {
-        //return float3(0, 0, 0);
+        return float3(1, 0, 0);
         ray.energy = 0.0f;
         // Sample the skybox and write it
         float theta = acos(ray.direction.y) / - PI;
@@ -424,42 +433,28 @@ void CSMain(uint3 id: SV_DispatchThreadID)
     
     Ray rayMarching = ray;
     float3 marchingColor = float3(0, 0, 0);
-    // uint cycle = 1;
-    // uint marchAdd = 0;
-    // for (i = 0; i < cycle; i ++)
-    // {
-        //     float3 currentPos = rayMarching.origin +
-        //     rayMarching.direction * (fristInpatchDistance * rand());
+    uint cycle = 1;
+    uint marchAdd = 0;
+    for (i = 0; i < cycle; i ++)
+    {
+        float3 currentPos = rayMarching.origin +
+        rayMarching.direction * (fristInpatchDistance * rand());
         
-        //     Ray r = CreateRay(currentPos, SampleGlobalsphere());
-        //     RayHit hit = Trace(r);
-        //     if(hit.hited)
-        //     {
-            //         marchingColor += hit.emission * r.energy * 10;
-            //         marchAdd += 1;
-            //     }
-            // }
-            // if(marchAdd > 1)marchingColor /= marchAdd;
-            
-            float3 final = sceneColor;
-            final += marchingColor;
-            
-            Result[id.xy] += float4(final, 1);
-            
-            ResultOut[id.xy] = Result[id.xy] / (_layerCount + 1);
-            
-            // // //Cover
-            // if (_layerCount > 0)
-            // {
-                //     float3 color = Result[id.xy].xyz;
-                //     color += final;
-                //     color /= 2.0;
-                
-                //     Result[id.xy] = float4(color, 1);
-                // }
-                // else
-                // {
-                    //     Result[id.xy] += float4(final, 1);
-                    // }
-                }
-                
+        Ray r = CreateRay(currentPos, SampleGlobalsphere());
+        RayHit hit = Trace(r);
+        if (hit.hited)
+        {
+            marchingColor += hit.emission * r.energy;
+            marchAdd += 1;
+        }
+    }
+    if(marchAdd > 1)marchingColor /= marchAdd;
+    
+    float3 final = sceneColor;
+    final += marchingColor * 1;
+    
+    Result[id.xy] += float4(final, 1);
+    
+    ResultOut[id.xy] = Result[id.xy] / (_layerCount + 1);
+}
+
