@@ -201,6 +201,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -238,7 +239,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &67835480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,6 +254,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 0
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   specular: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   smoothness: 0.543
@@ -329,7 +331,7 @@ Transform:
   m_LocalScale: {x: 1, y: 9, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 19
+  m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &89112678
 GameObject:
@@ -350,7 +352,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &89112679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,6 +367,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 0
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   specular: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   smoothness: 0.442
@@ -441,7 +444,7 @@ Transform:
   m_LocalScale: {x: 1, y: 9, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 20
+  m_RootOrder: 21
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &108972208
 GameObject:
@@ -461,7 +464,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &108972209
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -523,6 +526,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 0
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 1, g: 1, b: 1, a: 0}
   smoothness: 0
@@ -635,6 +639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -719,6 +724,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -831,6 +837,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -869,10 +876,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 0
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   specular: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   smoothness: 0.543
-  emission: {r: 0, g: 0, b: 0, a: 0}
+  emission: {r: 0.03137255, g: 1.3960785, b: 2.9960785, a: 0}
 --- !u!65 &394570063
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -941,8 +949,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 394570061}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2636571, y: 4.5, z: -7.9799995}
-  m_LocalScale: {x: 1, y: 9, z: 4}
+  m_LocalPosition: {x: -5.53, y: 4.39, z: 4.97}
+  m_LocalScale: {x: 1, y: 9, z: 3.5128798}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 17
@@ -1041,6 +1049,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -1139,6 +1148,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -1154,7 +1164,6 @@ GameObject:
   - component: {fileID: 534669905}
   - component: {fileID: 534669904}
   - component: {fileID: 534669903}
-  - component: {fileID: 534669906}
   - component: {fileID: 534669907}
   m_Layer: 0
   m_Name: Main Camera
@@ -1221,39 +1230,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_LocalRotation: {x: 0.0018158634, y: -0.9982209, z: 0.04225369, w: 0.04202853}
-  m_LocalPosition: {x: -1.1840569, y: 2.4173462, z: 13.89963}
+  m_LocalRotation: {x: 0.17178242, y: -0.22364503, z: 0.04001565, w: 0.9585784}
+  m_LocalPosition: {x: 6.18, y: 14.636543, z: -19.848125}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 30.217001, y: 43.178, z: -0.003}
---- !u!114 &534669906
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534669902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb2f2dd13e3b547dfb04da35718d5fdb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  RayTracingShader: {fileID: 7200000, guid: 3433e7b6752fc4b57a6d2e4b5210feec, type: 3}
-  depth: 3
-  sample: 1
-  _SkyboxTexture: {fileID: 2800000, guid: 050101a2710f34763aa6c2c043037de2, type: 3}
-  cover: 1
-  currentSample: 16
-  RayTracingEntities:
-  - {fileID: 1009851184}
-  - {fileID: 67835480}
-  - {fileID: 1409647579}
-  - {fileID: 108972211}
-  - {fileID: 394570062}
-  - {fileID: 1364637551}
-  - {fileID: 89112679}
 --- !u!114 &534669907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1347,6 +1330,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -1445,6 +1429,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -1543,6 +1528,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -1655,6 +1641,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -1739,6 +1726,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -1837,6 +1825,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -1935,6 +1924,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 1, g: 1, b: 1, a: 0}
   smoothness: 1
@@ -2033,6 +2023,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -2145,6 +2136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -2229,6 +2221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 1, g: 1, b: 1, a: 0}
   smoothness: 1
@@ -2341,10 +2334,124 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
   emission: {r: 2.4470592, g: 0.40582868, b: 0, a: 0}
+--- !u!1 &983138677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 983138682}
+  - component: {fileID: 983138681}
+  - component: {fileID: 983138680}
+  - component: {fileID: 983138679}
+  - component: {fileID: 983138678}
+  m_Layer: 0
+  m_Name: Cube (5)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &983138678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983138677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6be2fd4c5b57849f88100262b87ec881, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entityType: 0
+  radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
+  albedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  specular: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  smoothness: 0
+  emission: {r: 0, g: 0, b: 0, a: 0}
+--- !u!65 &983138679
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983138677}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &983138680
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983138677}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &983138681
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983138677}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &983138682
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983138677}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.39, y: 4.5, z: 10.64}
+  m_LocalScale: {x: 1, y: 9, z: 4}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 19
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &994103186
 GameObject:
   m_ObjectHideFlags: 0
@@ -2439,6 +2546,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -2477,10 +2585,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 0
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   specular: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  smoothness: 0.543
-  emission: {r: 0.016642934, g: 0.3207547, b: 0.18821327, a: 0}
+  smoothness: 0
+  emission: {r: 0.7264151, g: 0.17866565, b: 0, a: 0}
 --- !u!65 &1009851185
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2549,7 +2658,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1009851183}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.49, y: 4.5, z: -0.18999958}
+  m_LocalPosition: {x: 10.96, y: 4.5, z: 10.24}
   m_LocalScale: {x: 1, y: 9, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2649,6 +2758,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -2747,6 +2857,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -2845,6 +2956,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -2943,6 +3055,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -3041,6 +3154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -3077,12 +3191,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6be2fd4c5b57849f88100262b87ec881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entityType: 0
+  entityType: 3
   radius: 1
-  albedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  specular: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  smoothness: 0.543
-  emission: {r: 0, g: 0.2661514, b: 3.9999995, a: 0}
+  boxSize: {x: 1, y: 1, z: 1}
+  albedo: {r: 1, g: 1, b: 1, a: 1}
+  specular: {r: 1, g: 1, b: 1, a: 1}
+  smoothness: 0
+  emission: {r: 0, g: 0, b: 0, a: 0}
 --- !u!65 &1364637552
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3150,13 +3265,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1364637550}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.23, z: 0}
+  m_LocalRotation: {x: 0.40204075, y: -0.095283784, z: 0.8736862, w: -0.25682047}
+  m_LocalPosition: {x: 2.241, y: 1.242, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 16
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -2.2930002, y: 48.769, z: 211.722}
 --- !u!1 &1385286273
 GameObject:
   m_ObjectHideFlags: 0
@@ -3237,6 +3352,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -3335,6 +3451,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -3433,9 +3550,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 0
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 1, g: 1, b: 1, a: 0}
-  smoothness: 0.585
+  smoothness: 0
   emission: {r: 0, g: 0, b: 0, a: 0}
 --- !u!4 &1409647580
 Transform:
@@ -3545,6 +3663,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -3564,7 +3683,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1433356194
 Transform:
   m_ObjectHideFlags: 0
@@ -3687,6 +3806,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -3771,6 +3891,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -3883,6 +4004,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -3967,6 +4089,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -4079,6 +4202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -4177,6 +4301,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -4261,6 +4386,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 13.69
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 1, g: 1, b: 1, a: 0}
   smoothness: 1
@@ -4373,6 +4499,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -4418,6 +4545,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 1, g: 1, b: 1, a: 0}
   smoothness: 0.449
@@ -4569,6 +4697,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -4667,6 +4796,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -4751,6 +4881,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1
@@ -4849,6 +4980,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 2
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -4961,6 +5093,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -5059,6 +5192,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -5157,6 +5291,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 0
@@ -5303,6 +5438,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityType: 2
   radius: 1
+  boxSize: {x: 1, y: 1, z: 1}
   albedo: {r: 1, g: 1, b: 1, a: 0}
   specular: {r: 0, g: 0, b: 0, a: 0}
   smoothness: 1

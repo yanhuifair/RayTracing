@@ -4,7 +4,7 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float4> Result;
-RWTexture2D<float4> Result2;
+RWTexture2D<float4> ResultOut;
 float4x4 _CameraToWorld;
 float4x4 _CameraInverseProjection;
 
@@ -17,8 +17,9 @@ float2 _PixelOffset;
 
 float3 _ScreenSize;
 uint _depth;
-uint _sample;
+uint _SamplePerPixel;
 float _CameraFar;
+uint _layerCount;
 
 struct Sphere
 {
@@ -33,6 +34,21 @@ struct Sphere
 };
 StructuredBuffer<Sphere> _Spheres;
 uint _numSpheres;
+
+
+struct Box
+{
+    float3 position;
+    float3 rotation;
+    float3 size;
+    
+    float3 albedo;
+    float3 specular;
+    float smoothness;
+    float3 emission;
+};
+StructuredBuffer<Box> _Boxs;
+uint _numBoxs;
 
 
 struct MeshObject
@@ -157,6 +173,40 @@ void IntersectSphere(Ray ray, inout RayHit hit, Sphere sphere)
 }
 
 
+// axis aligned box centered at the origin, with size boxSize
+void IntersectionBox(Ray ray, inout RayHit hit, Box box)
+{
+    float3 ro = ray.origin;
+    float3 rd = ray.direction;
+    float3 m = 1.0 / rd; // can precompute if traversing a set of aligned boxes
+    float3 n = m * ro;   // can precompute if traversing a set of aligned boxes
+    float3 k = abs(m) * box.size;
+    float3 t1 = -n - k;
+    float3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    float t = tN;
+    if (tN > tF || tF < 0.0)
+    {
+        hit.hited = false;
+    }
+    else
+    {
+        if(t > 0 && t < _CameraFar && t < hit.distance)
+        {
+            hit.distance = t;
+            hit.position = ray.origin + t * ray.direction;
+            hit.normal = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);
+            hit.albedo = box.albedo;
+            hit.specular = box.specular;
+            hit.smoothness = box.smoothness;
+            hit.emission = box.emission;
+            hit.hited = true;
+        }
+    }
+}
+
+
 bool IntersectTriangle(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 inout float t, inout float u, inout float v)
 {
@@ -171,8 +221,8 @@ inout float t, inout float u, inout float v)
     float det = dot(edge1, pvec);
     
     // use backface culling
-    if (det < EPSILON)
-        return false;
+    if (det < EPSILON)return false;
+    
     float inv_det = 1.0f / det;
     
     // calculate distance from vert0 to ray origin
@@ -180,8 +230,7 @@ inout float t, inout float u, inout float v)
     
     // calculate U parameter and test bounds
     u = dot(tvec, pvec) * inv_det;
-    if (u < 0.0 || u > 1.0f)
-        return false;
+    if (u < 0.0 || u > 1.0f)return false;
     
     // prepare to test V parameter
     float3 qvec = cross(tvec, edge1);
@@ -268,6 +317,12 @@ RayHit Trace(Ray ray)
         IntersectSphere(ray, bestHit, _Spheres[i]);
     }
     
+    // Trace Box
+    for (i = 0; i < _numBoxs; i ++)
+    {
+        IntersectionBox(ray, bestHit, _Boxs[i]);
+    }
+    
     // Trace mesh objects
     for (i = 0; i < _numMeshObjects; i ++)
     {
@@ -316,7 +371,7 @@ float3 Shade(inout Ray ray, RayHit hit)
             ray.direction = SampleHemisphere(hit.normal, 1.0f);
             ray.energy *= (1.0f / diffChance) * hit.albedo;
         }
-        return hit.emission;
+        return hit.emission ;
     }
     else
     {
@@ -365,29 +420,46 @@ void CSMain(uint3 id: SV_DispatchThreadID)
             break;
         }
     }
-    sceneColor /= _sample;
+    //sceneColor /= _SamplePerPixel;
     
     Ray rayMarching = ray;
     float3 marchingColor = float3(0, 0, 0);
-    uint cycle = 1;
-    uint marchAdd = 0;
-    for (i = 0; i < cycle; i ++)
-    {
-        float3 currentPos = rayMarching.origin +
-        rayMarching.direction * (fristInpatchDistance * rand());
+    // uint cycle = 1;
+    // uint marchAdd = 0;
+    // for (i = 0; i < cycle; i ++)
+    // {
+        //     float3 currentPos = rayMarching.origin +
+        //     rayMarching.direction * (fristInpatchDistance * rand());
         
-        Ray r = CreateRay(currentPos, SampleGlobalsphere());
-        RayHit hit = Trace(r);
-        if(hit.hited)
-        {
-            marchingColor += hit.emission * r.energy * 10;
-            marchAdd += 1;
-        }
-    }
-    if(marchAdd > 1)marchingColor /= marchAdd;
-    
-    float3 final = sceneColor;
-    final += marchingColor;
-    Result[id.xy] = float4(final, 1);
-}
-
+        //     Ray r = CreateRay(currentPos, SampleGlobalsphere());
+        //     RayHit hit = Trace(r);
+        //     if(hit.hited)
+        //     {
+            //         marchingColor += hit.emission * r.energy * 10;
+            //         marchAdd += 1;
+            //     }
+            // }
+            // if(marchAdd > 1)marchingColor /= marchAdd;
+            
+            float3 final = sceneColor;
+            final += marchingColor;
+            
+            Result[id.xy] += float4(final, 1);
+            
+            ResultOut[id.xy] = Result[id.xy] / (_layerCount + 1);
+            
+            // // //Cover
+            // if (_layerCount > 0)
+            // {
+                //     float3 color = Result[id.xy].xyz;
+                //     color += final;
+                //     color /= 2.0;
+                
+                //     Result[id.xy] = float4(color, 1);
+                // }
+                // else
+                // {
+                    //     Result[id.xy] += float4(final, 1);
+                    // }
+                }
+                
