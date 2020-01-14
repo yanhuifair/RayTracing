@@ -29,7 +29,7 @@ public class RayTracingSystem
         {
             if (renderTextureAdd == null)
             {
-                renderTextureAdd = RenderTexture.GetTemporary(resolution.x, resolution.y, 0, RenderTextureFormat.DefaultHDR);
+                renderTextureAdd = RenderTexture.GetTemporary(resolution.x, resolution.y, 0, RenderTextureFormat.ARGBFloat);
                 renderTextureAdd.enableRandomWrite = true;
                 renderTextureAdd.autoGenerateMips = false;
                 renderTextureAdd.Create();
@@ -45,7 +45,7 @@ public class RayTracingSystem
         {
             if (renderTextureOut == null)
             {
-                renderTextureOut = RenderTexture.GetTemporary(resolution.x, resolution.y, 0, RenderTextureFormat.DefaultHDR);
+                renderTextureOut = RenderTexture.GetTemporary(resolution.x, resolution.y, 0, RenderTextureFormat.ARGBFloat);
                 renderTextureOut.enableRandomWrite = true;
                 renderTextureOut.autoGenerateMips = false;
                 renderTextureOut.Create();

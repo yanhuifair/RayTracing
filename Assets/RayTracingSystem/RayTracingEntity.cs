@@ -26,8 +26,8 @@ public class RayTracingEntity : MonoBehaviour
     [OnValueChanged("AttributeChanged")][ShowIf("entityType", EntityType.Box)] public Vector3 boxSize = Vector3.one;
 
     [Header("Render")]
-    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, false)] public Color albedo = Color.gray;
-    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, false)] public Color specular = Color.gray;
+    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, true)] public Color albedo = Color.gray;
+    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, true)] public Color specular = Color.gray;
     [OnValueChanged("AttributeChanged")][Range(0, 1)] public float smoothness;
     [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, true)] public Color emission;
 

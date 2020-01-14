@@ -9,7 +9,7 @@ public class RenderWindow : EditorWindow
 {
     static ComputeShader RayTracingComputeShader;
     static int samplePerPixel = 1;
-    static int bounces = 3;
+    static int bounces = 4;
     static Vector2Int resolution = new Vector2Int(1280, 720);
     static Texture2D skyBoxTexture;
     static RenderTexture renderTexture;
