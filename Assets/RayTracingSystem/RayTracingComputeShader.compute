@@ -16,10 +16,10 @@ static const float EPSILON = 1e-8;
 float2 _PixelOffset;
 
 float3 _ScreenSize;
-uint _depth;
+uint _bounces;
 uint _SamplePerPixel;
 float _CameraFar;
-uint _layerCount;
+uint _sampleCount;
 
 struct Sphere
 {
@@ -93,6 +93,8 @@ struct RayHit
 
 float2 _Pixel;
 float _Seed;
+StructuredBuffer<float> _Random;
+
 float rand()
 {
     float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
@@ -380,6 +382,7 @@ float3 Shade(inout Ray ray, RayHit hit)
             ray.direction = SampleHemisphere(hit.normal, 1.0f);
             ray.energy *= (1.0f / diffChance) * hit.albedo;
         }
+        //return hit.albedo ;
         return hit.emission;
     }
     else
@@ -393,6 +396,54 @@ float3 Shade(inout Ray ray, RayHit hit)
     }
 }
 
+float fristInpatchDistance;
+float3 SceneColor(Ray ray)
+{
+    float3 sceneColor = float3(0, 0, 0);
+    for (uint i = 0; i < _bounces; i ++)
+    {
+        RayHit hit = Trace(ray);
+        if (hit.hited)
+        {
+            if(i == 0)
+            {
+                fristInpatchDistance = hit.distance;
+            }
+            sceneColor += Shade(ray, hit);
+            if(!any(ray.energy))break;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return sceneColor;
+}
+
+float3 FogColor(Ray ray)
+{
+    Ray rayMarching = ray;
+    float3 fogColor = float3(0, 0, 0);
+    uint cycle = 1;
+    uint marchAdd = 0;
+    for (uint i = 0; i < cycle; i ++)
+    {
+        float3 currentPos = rayMarching.origin +
+        rayMarching.direction * (fristInpatchDistance * rand());
+        
+        Ray r = CreateRay(currentPos, SampleGlobalsphere());
+        RayHit hit = Trace(r);
+        if(hit.hited)
+        {
+            fogColor += hit.emission * r.energy;
+            marchAdd += 1;
+        }
+    }
+    if(marchAdd > 1)fogColor /= marchAdd;
+    return fogColor ;
+}
+
+
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id: SV_DispatchThreadID)
 {
@@ -404,57 +455,23 @@ void CSMain(uint3 id: SV_DispatchThreadID)
     // Transform pixel to [-1,1] range
     float2 uv = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
     
-    
-    
-    uint i;
-    // Get a ray for the UVs
-    Ray ray = CreateCameraRay(uv);
-    Ray sceneRay = ray;
-    float3 sceneColor = float3(0, 0, 0);
-    float fristInpatchDistance;
-    for (i = 0; i < _depth; i ++)
+    float3 final = float3(0, 0, 0);
+    for (uint spp = 0; spp < _SamplePerPixel; spp ++)
     {
-        RayHit hit = Trace(sceneRay);
-        if (hit.hited)
-        {
-            if(i == 0)
-            {
-                fristInpatchDistance = hit.distance;
-            }
-            sceneColor += ray.energy * Shade(sceneRay, hit);
-            if(!any(sceneRay.energy))break;
-        }
-        else
-        {
-            break;
-        }
+        Ray ray = CreateCameraRay(uv);
+        Ray sceneRay = ray;
+        Ray fogRay = ray;
+        float3 sceneColor = SceneColor(sceneRay);
+        float3 fogColor = FogColor(fogRay);
+        final += sceneColor;
+        final += fogColor;
+        //final /= 2;
     }
-    //sceneColor /= _SamplePerPixel;
-    
-    Ray rayMarching = ray;
-    float3 marchingColor = float3(0, 0, 0);
-    uint cycle = 1;
-    uint marchAdd = 0;
-    for (i = 0; i < cycle; i ++)
-    {
-        float3 currentPos = rayMarching.origin +
-        rayMarching.direction * (fristInpatchDistance * rand());
-        
-        Ray r = CreateRay(currentPos, SampleGlobalsphere());
-        RayHit hit = Trace(r);
-        if (hit.hited)
-        {
-            marchingColor += hit.emission * r.energy;
-            marchAdd += 1;
-        }
-    }
-    if(marchAdd > 1)marchingColor /= marchAdd;
-    
-    float3 final = sceneColor;
-    final += marchingColor * 1;
-    
+    // final *= log(2.2);
+    // final = pow(final, 2.2);
+    // final = pow(final, 2.2);
     Result[id.xy] += float4(final, 1);
     
-    ResultOut[id.xy] = Result[id.xy] / (_layerCount + 1);
+    ResultOut[id.xy] = Result[id.xy] / _sampleCount;
 }
 

@@ -19,22 +19,22 @@ public class RayTracingSystem
         }
     }
     public int samplePerPixel;
-    public int depth;
+    public int bounces;
     public Vector2Int resolution = new Vector2Int(1280, 720);
     public Texture2D skyBoxTexture;
-    RenderTexture renderTexture;
-    RenderTexture GetRenderTexture
+    RenderTexture renderTextureAdd;
+    RenderTexture GetRenderTextureAdd
     {
         get
         {
-            if (renderTexture == null)
+            if (renderTextureAdd == null)
             {
-                renderTexture = RenderTexture.GetTemporary(resolution.x, resolution.y, 0, RenderTextureFormat.DefaultHDR);
-                renderTexture.enableRandomWrite = true;
-                renderTexture.autoGenerateMips = false;
-                renderTexture.Create();
+                renderTextureAdd = RenderTexture.GetTemporary(resolution.x, resolution.y, 0, RenderTextureFormat.DefaultHDR);
+                renderTextureAdd.enableRandomWrite = true;
+                renderTextureAdd.autoGenerateMips = false;
+                renderTextureAdd.Create();
             }
-            return renderTexture;
+            return renderTextureAdd;
         }
     }
 
@@ -55,28 +55,29 @@ public class RayTracingSystem
     }
 
     public int needReset = 0;
-    public void ResetRenderTexture()
+    public RenderTexture ResetRenderTexture()
     {
-        if (renderTexture != null) renderTexture.Release();
-        renderTexture = null;
+        if (renderTextureAdd != null) renderTextureAdd.Release();
+        renderTextureAdd = null;
 
         if (renderTextureOut != null) renderTextureOut.Release();
         renderTextureOut = null;
 
-        layerCount = 0;
+        sampleCount = 0;
+        return GetRenderTextureAdd;
     }
     public Camera camera;
-    public int layerCount = 0;
+    public int sampleCount = 0;
     //Scene
     //List<RayTracingEntity> RayTracingEntities = new List<RayTracingEntity>();
     public RayTracingEntity[] RayTracingEntities;
 
     public void Release()
     {
-        if (renderTexture)
+        if (renderTextureAdd)
         {
-            renderTexture.Release();
-            renderTexture = null;
+            renderTextureAdd.Release();
+            renderTextureAdd = null;
         }
 
         if (sphereBuffer != null)
@@ -121,7 +122,7 @@ public class RayTracingSystem
         spheres.Clear();
         foreach (var item in RayTracingEntities)
         {
-            if (item.entityType == RayTracingEntity.EntityType.Sphere && item.gameObject.activeSelf == true)
+            if (item.entityType == RayTracingEntity.EntityType.Sphere && item.gameObject.activeInHierarchy == true)
             {
                 var sphere = new SphereInfo();
                 sphere.position = item.transform.position;
@@ -170,7 +171,7 @@ public class RayTracingSystem
         boxs.Clear();
         foreach (var item in RayTracingEntities)
         {
-            if (item.entityType == RayTracingEntity.EntityType.Box && item.gameObject.activeSelf == true)
+            if (item.entityType == RayTracingEntity.EntityType.Box && item.gameObject.activeInHierarchy == true)
             {
                 var box = new BoxInfo();
                 Matrix4x4 matrix4X4 = Matrix4x4.TRS(item.transform.position, item.transform.rotation, item.transform.lossyScale);
@@ -230,7 +231,7 @@ public class RayTracingSystem
 
         foreach (RayTracingEntity item in RayTracingEntities)
         {
-            if (item.entityType == RayTracingEntity.EntityType.Mesh && item.gameObject.activeSelf == true)
+            if (item.entityType == RayTracingEntity.EntityType.Mesh && item.gameObject.activeInHierarchy == true)
             {
                 MeshFilter meshFilter = item.gameObject.GetComponent<MeshFilter>();
                 if (meshFilter == null) continue;
@@ -297,6 +298,12 @@ public class RayTracingSystem
         }
     }
 
+    private ComputeBuffer _randomBuffer;
+    void SetupRandom()
+    {
+
+    }
+
     void SetShaderParameters()
     {
         RayTracingComputeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
@@ -306,12 +313,14 @@ public class RayTracingSystem
 
         RayTracingComputeShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
 
-        RayTracingComputeShader.SetVector("_ScreenSize", new Vector2(GetRenderTexture.width, GetRenderTexture.height));
+        RayTracingComputeShader.SetVector("_ScreenSize", new Vector2(GetRenderTextureAdd.width, GetRenderTextureAdd.height));
 
-        RayTracingComputeShader.SetInt("_depth", depth);
+        RayTracingComputeShader.SetInt("_bounces", bounces);
         RayTracingComputeShader.SetInt("_SamplePerPixel", samplePerPixel);
         RayTracingComputeShader.SetFloat("_Seed", UnityEngine.Random.value);
-        RayTracingComputeShader.SetInt("_layerCount", layerCount);
+
+        sampleCount += samplePerPixel;
+        RayTracingComputeShader.SetInt("_sampleCount", sampleCount);
 
         //Sphere
         RayTracingComputeShader.SetBuffer(KERNALINDEX, "_Spheres", sphereBuffer);
@@ -341,18 +350,21 @@ public class RayTracingSystem
     public RenderTexture Render()
     {
         RayTracingEntities = GameObject.FindObjectsOfType<RayTracingEntity>();
-
         foreach (var item in RayTracingEntities)
         {
-            if (item.transform.hasChanged)
+            if (item.AnyChanged())
             {
                 needReset += 1;
-                item.transform.hasChanged = false;
+                item.ResetChanged();
             }
         }
-        if (needReset > 0) { ResetRenderTexture(); needReset = 0; }
 
-        SetupScene();
+        if (needReset > 0)
+        {
+            SetupScene();
+            ResetRenderTexture();
+            needReset = 0;
+        }
 
         SetShaderParameters();
 
@@ -362,12 +374,11 @@ public class RayTracingSystem
 
     void Dispatch()
     {
-        RayTracingComputeShader.SetTexture(KERNALINDEX, "Result", GetRenderTexture);
+        RayTracingComputeShader.SetTexture(KERNALINDEX, "Result", GetRenderTextureAdd);
         RayTracingComputeShader.SetTexture(KERNALINDEX, "ResultOut", GetRenderTextureOut);
-        int threadGroupsX = Mathf.CeilToInt(GetRenderTexture.width / 8);
-        int threadGroupsY = Mathf.CeilToInt(GetRenderTexture.height / 8);
+        int threadGroupsX = Mathf.CeilToInt(GetRenderTextureAdd.width / 8);
+        int threadGroupsY = Mathf.CeilToInt(GetRenderTextureAdd.height / 8);
         RayTracingComputeShader.Dispatch(KERNALINDEX, threadGroupsX, threadGroupsY, 1);
-        layerCount++;
     }
 
 }

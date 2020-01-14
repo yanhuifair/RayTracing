@@ -47,6 +47,15 @@ public class Automaton : MonoBehaviour
     }
     public GameObject cube;
     public GameObject parent;
+    public GameObject Parent
+    {
+        get
+        {
+            if (parent == null) parent = new GameObject();
+            return parent;
+        }
+    }
+
     [SerializeField] GameObject[, , ] gameObjects;
     GameObject[, , ] GameObjects
     {
@@ -190,7 +199,7 @@ public class Automaton : MonoBehaviour
                             if (GameObjects[x, y, z] == null)
                             {
                                 GameObjects[x, y, z] = PrefabUtility.InstantiatePrefab(cube) as GameObject;
-                                GameObjects[x, y, z].transform.parent = parent.transform;
+                                GameObjects[x, y, z].transform.parent = Parent.transform;
                                 GameObjects[x, y, z].transform.position = new Vector3(x, y, z);
                                 GameObjects[x, y, z].SetActive(Cells[x, y, z].state > 0);
                             }
