@@ -193,12 +193,10 @@ public class RenderWindow : EditorWindow
 
     static void Interation()
     {
-
         if (camera != null && RayTracingComputeShader != null)
         {
             if (!camera.transform.position.IsApproximate(positionLast, 0.001f)
                 || !camera.transform.rotation.IsApproximate(quaternionLast)
-
             )
             {
                 positionLast = camera.transform.position;
@@ -215,5 +213,4 @@ public class RenderWindow : EditorWindow
             UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
         }
     }
-
 }

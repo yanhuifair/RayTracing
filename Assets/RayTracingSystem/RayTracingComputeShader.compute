@@ -10,6 +10,7 @@ float4x4 _CameraInverseProjection;
 
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
+
 static const float PI = 3.14159265f;
 static const float EPSILON = 1e-8;
 
@@ -94,7 +95,6 @@ struct RayHit
 float2 _Pixel;
 float _Seed;
 StructuredBuffer<float> _Random;
-
 float rand()
 {
     float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
@@ -106,7 +106,8 @@ RayHit CreateRayHit()
 {
     RayHit hit;
     hit.position = float3(0, 0, 0);
-    hit.distance = _CameraFar;
+    // hit.distance = _CameraFar;
+    hit.distance = 1.#INF;
     hit.normal = float3(0, 0, 0);
     hit.albedo = float3(0.1, 0.1, 0.1);
     hit.specular = float3(0.0, 0.0, 0.0);
@@ -162,7 +163,7 @@ void IntersectSphere(Ray ray, inout RayHit hit, Sphere sphere)
         return;
     float p2 = sqrt(p2sqr);
     float t = p1 - p2 > 0 ? p1 - p2: p1 + p2;
-    if(t > 0 && t < _CameraFar && t < hit.distance)
+    if(t > 0 && t < hit.distance)
     {
         hit.distance = t;
         hit.position = ray.origin + t * ray.direction;
@@ -318,7 +319,7 @@ float3 SampleGlobalsphere()
 RayHit Trace(Ray ray)
 {
     RayHit bestHit = CreateRayHit();
-    uint i;
+    uint count, stride, i;
     // Trace ground plane
     //IntersectGroundPlane(ray, bestHit);
     
@@ -352,7 +353,7 @@ float energy(float3 color)
 }
 float SmoothnessToPhongAlpha(float s)
 {
-    return pow(10000000.0f, s * s);
+    return pow(1000000.0f, s * s);
 }
 float3 Shade(inout Ray ray, RayHit hit)
 {
@@ -375,20 +376,25 @@ float3 Shade(inout Ray ray, RayHit hit)
             float f = (alpha + 2) / (alpha + 1);
             ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
         }
-        else
+        else if (diffChance > 0 && roulette < specChance + diffChance)
         {
             // Diffuse reflection
             ray.origin = hit.position + hit.normal * 0.001f;
             ray.direction = SampleHemisphere(hit.normal, 1.0f);
             ray.energy *= (1.0f / diffChance) * hit.albedo;
         }
-        //return hit.albedo ;
+        else
+        {
+            // Terminate ray
+            ray.energy = 0.0f;
+        }
         return hit.emission;
     }
     else
     {
-        return float3(1, 0, 0);
+        // Erase the ray's energy - the sky doesn't reflect anything
         ray.energy = 0.0f;
+        
         // Sample the skybox and write it
         float theta = acos(ray.direction.y) / - PI;
         float phi = atan2(ray.direction.x, -ray.direction.z) / - PI * 0.5f;
@@ -396,8 +402,7 @@ float3 Shade(inout Ray ray, RayHit hit)
     }
 }
 
-float fristInpatchDistance;
-float3 SceneColor(Ray ray)
+float3 SceneColor(Ray ray, inout float screenDepth)
 {
     float3 sceneColor = float3(0, 0, 0);
     for (uint i = 0; i < _bounces; i ++)
@@ -407,29 +412,24 @@ float3 SceneColor(Ray ray)
         {
             if(i == 0)
             {
-                fristInpatchDistance = hit.distance;
+                screenDepth = hit.distance;
             }
-            sceneColor += Shade(ray, hit);
-            if(!any(ray.energy))break;
         }
-        else
-        {
-            break;
-        }
+        sceneColor += ray.energy * Shade(ray, hit);
+        if(!any(ray.energy))break;
     }
     return sceneColor;
 }
 
-float3 FogColor(Ray ray)
+float3 FogColor(Ray ray, float screenDepth)
 {
-    Ray rayMarching = ray;
     float3 fogColor = float3(0, 0, 0);
     uint cycle = 1;
     uint marchAdd = 0;
     for (uint i = 0; i < cycle; i ++)
     {
-        float3 currentPos = rayMarching.origin +
-        rayMarching.direction * (fristInpatchDistance * rand());
+        float3 currentPos = ray.origin +
+        ray.direction * (screenDepth * rand());
         
         Ray r = CreateRay(currentPos, SampleGlobalsphere());
         RayHit hit = Trace(r);
@@ -461,8 +461,9 @@ void CSMain(uint3 id: SV_DispatchThreadID)
         Ray ray = CreateCameraRay(uv);
         Ray sceneRay = ray;
         Ray fogRay = ray;
-        float3 sceneColor = SceneColor(sceneRay);
-        float3 fogColor = FogColor(fogRay);
+        float screenDepth = 0;
+        float3 sceneColor = SceneColor(sceneRay, screenDepth);
+        float3 fogColor = FogColor(fogRay, screenDepth);
         final += sceneColor;
         final += fogColor;
         //final /= 2;
@@ -470,8 +471,8 @@ void CSMain(uint3 id: SV_DispatchThreadID)
     // final *= log(2.2);
     // final = pow(final, 2.2);
     // final = pow(final, 2.2);
-    Result[id.xy] += float4(final, 1);
     
+    Result[id.xy] += float4(final, 1);
     ResultOut[id.xy] = Result[id.xy] / _sampleCount;
 }
 
