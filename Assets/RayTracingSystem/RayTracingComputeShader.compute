@@ -355,13 +355,13 @@ RayHit Trace(Ray ray)
     // // Trace spheres
     // for (i = 0; i < _numSpheres; i ++)
     // {
-        //     IntersectSphere(ray, bestHit, _Spheres[i]);
+        //     //IntersectSphere(ray, bestHit, _Spheres[i]);
         // }
         
         // // Trace Box
         // for (i = 0; i < _numBoxs; i ++)
         // {
-            //     IntersectionBox(ray, bestHit, _Boxs[i]);
+            //     //IntersectionBox(ray, bestHit, _Boxs[i]);
             // }
             
             Ray boundRay = ray;
@@ -458,22 +458,15 @@ RayHit Trace(Ray ray)
         float3 FogColor(Ray ray, float screenDepth)
         {
             float3 fogColor = float3(0, 0, 0);
-            uint cycle = 1;
-            uint marchAdd = 0;
-            for (uint i = 0; i < cycle; i ++)
+            float3 currentPos = ray.origin +
+            ray.direction * (screenDepth * rand());
+            
+            Ray r = CreateRay(currentPos, SampleGlobalsphere());
+            RayHit hit = Trace(r);
+            if(hit.hited)
             {
-                float3 currentPos = ray.origin +
-                ray.direction * (screenDepth * rand());
-                
-                Ray r = CreateRay(currentPos, SampleGlobalsphere());
-                RayHit hit = Trace(r);
-                if(hit.hited)
-                {
-                    fogColor += hit.emission * r.energy;
-                    marchAdd += 1;
-                }
+                fogColor += hit.emission * r.energy;
             }
-            if(marchAdd > 1)fogColor /= marchAdd;
             return fogColor ;
         }
         
@@ -489,9 +482,8 @@ RayHit Trace(Ray ray)
             // Get the dimensions of the RenderTexture
             uint width = _ScreenSize.x;
             uint height = _ScreenSize.y;
-            
             // Transform pixel to [-1,1] range
-            float2 uv = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+            float2 uv = float2((id.xy + _PixelOffset * rand()) / float2(width, height) * 2.0f - 1.0f) ;
             
             float3 final = float3(0, 0, 0);
             for (uint spp = 0; spp < _SamplePerPixel; spp ++)
@@ -506,11 +498,10 @@ RayHit Trace(Ray ray)
                 Ray fogRay = ray;
                 float screenDepth = 0;
                 float3 sceneColor = SceneColor(sceneRay, screenDepth);
-                //float3 fogColor = FogColor(fogRay, screenDepth);
                 final += sceneColor;
-                //final += fogColor ;
+                //float3 fogColor = FogColor(fogRay, screenDepth);
+                //final += fogColor;
                 //final /= 2;
-                
                 
                 //Random
                 _Seed = _randomBuffer[spp];

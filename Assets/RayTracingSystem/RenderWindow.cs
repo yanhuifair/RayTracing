@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -27,7 +28,7 @@ public class RenderWindow : EditorWindow
         }
     }
 
-    static string path = "/Users/fairimac/Desktop";
+    static string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
     [MenuItem("Ray Tracing/Render Window")]
     static void Init()
@@ -53,7 +54,7 @@ public class RenderWindow : EditorWindow
 
         GUILayout.BeginHorizontal();
         rayTracingSystem.RayTracingComputeShader = EditorGUILayout.ObjectField("ComputeShader", rayTracingSystem.RayTracingComputeShader, typeof(ComputeShader), false) as ComputeShader;
-        rayTracingSystem.skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", rayTracingSystem.skyBoxTexture, typeof(Object), false) as Texture2D;
+        rayTracingSystem.skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", rayTracingSystem.skyBoxTexture, typeof(UnityEngine.Object), false) as Texture2D;
         GUILayout.EndHorizontal();
 
         //Camera
