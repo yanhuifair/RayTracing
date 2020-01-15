@@ -22,6 +22,10 @@ uint _SamplePerPixel;
 float _CameraFar;
 uint _sampleCount;
 
+//DOF
+float _focus;
+float _circleOfConfusion;
+
 struct Sphere
 {
     float3 position;
@@ -463,10 +467,11 @@ void CSMain(uint3 id: SV_DispatchThreadID)
     for (uint spp = 0; spp < _SamplePerPixel; spp ++)
     {
         Ray ray = CreateCameraRay(uv);
-        float fouceDis = 4.5;
-        float3 foucePos = ray.origin + ray.direction * fouceDis;
-        ray.origin += cross(SampleGlobalsphere(), ray.direction) * 0.0f;
+        //Dof
+        float3 foucePos = ray.origin + ray.direction * _focus;
+        ray.origin += cross(SampleGlobalsphere(), ray.direction) * _circleOfConfusion;
         ray.direction = normalize(foucePos - ray.origin);
+        //
         Ray sceneRay = ray;
         Ray fogRay = ray;
         float screenDepth = 0;

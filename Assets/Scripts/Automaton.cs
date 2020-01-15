@@ -28,9 +28,6 @@ public class Automaton : MonoBehaviour
     struct Cell
     {
         public int state;
-        public float x;
-        public float y;
-        public float z;
     }
 
     [SerializeField] Cell[, , ] cells;
@@ -217,22 +214,22 @@ public class Automaton : MonoBehaviour
     {
         Gizmos.DrawWireCube(new Vector3(spaceSize / 2, spaceSize / 2, spaceSize / 2), Vector3.one * spaceSize);
 
-        return;
-        for (int x = 0; x < spaceSize; x++)
-        {
-            for (int y = 0; y < spaceSize; y++)
-            {
-                for (int z = 0; z < spaceSize; z++)
-                {
-                    if (Cells[x, y, z].state > 0)
-                    {
-                        if (useGradient) Gizmos.color = gradient.Evaluate((float) Cells[x, y, z].state / stateMax);
-                        // Gizmos.DrawWireCube(new Vector3(x, y, z), Vector3.one * Cells[x, y, z].state / stateMax);
-                        //Gizmos.DrawWireCube(new Vector3(x, y, z), Vector3.one);
-                        Gizmos.DrawCube(new Vector3(x, y, z), Vector3.one);
-                    }
-                }
-            }
-        }
+        // return;
+        // for (int x = 0; x < spaceSize; x++)
+        // {
+        //     for (int y = 0; y < spaceSize; y++)
+        //     {
+        //         for (int z = 0; z < spaceSize; z++)
+        //         {
+        //             if (Cells[x, y, z].state > 0)
+        //             {
+        //                 if (useGradient) Gizmos.color = gradient.Evaluate((float) Cells[x, y, z].state / stateMax);
+        //                 // Gizmos.DrawWireCube(new Vector3(x, y, z), Vector3.one * Cells[x, y, z].state / stateMax);
+        //                 //Gizmos.DrawWireCube(new Vector3(x, y, z), Vector3.one);
+        //                 Gizmos.DrawCube(new Vector3(x, y, z), Vector3.one);
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

@@ -7,13 +7,11 @@ using UnityEngine.SceneManagement;
 
 public class RenderWindow : EditorWindow
 {
-    static ComputeShader RayTracingComputeShader;
     static int samplePerPixel = 1;
-    static int bounces = 4;
-    static Vector2Int resolution = new Vector2Int(1280, 720);
+    static Vector2 resolution = new Vector2(1280, 720);
+    static float resolutionScale = 1;
     static Texture2D skyBoxTexture;
     static RenderTexture renderTexture;
-    static Camera camera;
     static List<Camera> cameras = new List<Camera>();
     static int cameraIndex = 0;
 
@@ -39,7 +37,6 @@ public class RenderWindow : EditorWindow
 
     private void OnEnable()
     {
-        timeAdd = 0;
         EditorApplication.update += Upadte;
     }
 
@@ -55,21 +52,11 @@ public class RenderWindow : EditorWindow
         float singleLineHeight = EditorGUIUtility.singleLineHeight;
 
         GUILayout.BeginHorizontal();
-        RayTracingComputeShader = EditorGUILayout.ObjectField("ComputeShader", RayTracingComputeShader, typeof(ComputeShader), false) as ComputeShader;
-        skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", skyBoxTexture, typeof(Object), false) as Texture2D;
+        rayTracingSystem.RayTracingComputeShader = EditorGUILayout.ObjectField("ComputeShader", rayTracingSystem.RayTracingComputeShader, typeof(ComputeShader), false) as ComputeShader;
+        rayTracingSystem.skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", rayTracingSystem.skyBoxTexture, typeof(Object), false) as Texture2D;
         GUILayout.EndHorizontal();
 
-        GUILayout.BeginHorizontal();
-        samplePerPixel = EditorGUILayout.IntSlider("SamplePerPixel", samplePerPixel, 1, 1000);
-        bounces = EditorGUILayout.IntSlider("Bounces", bounces, 1, 10);
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        var x = EditorGUILayout.IntField("Width", resolution.x);
-        var y = EditorGUILayout.IntField("Height", resolution.y);
-        resolution = new Vector2Int(x, y);
-        GUILayout.EndHorizontal();
-
+        //Camera
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Refresh Cameras"))
         {
@@ -83,7 +70,7 @@ public class RenderWindow : EditorWindow
                 if (cameras.Contains(camera)) continue;
 
                 cameras.Add(camera);
-                rayTracingSystem.needReset += 1;
+                if (rayTracingSystem.camera == null) rayTracingSystem.camera = camera;
             }
         }
         if (cameras.Count > 0)
@@ -94,20 +81,57 @@ public class RenderWindow : EditorWindow
                 if (cameras[i] != null) cameraNames[i] = cameras[i].name;
             }
             EditorGUI.BeginChangeCheck();
-            cameraIndex = EditorGUILayout.Popup(cameraIndex, cameraNames);
+            cameraIndex = EditorGUILayout.Popup(cameraIndex, cameraNames, GUILayout.Width(position.width / 2 - spacing * 2));
             if (EditorGUI.EndChangeCheck())
             {
-                camera = cameras[cameraIndex];
-                rayTracingSystem.needReset += 1;
+                rayTracingSystem.camera = cameras[cameraIndex];
+                rayTracingSystem.needReset = true;
             }
         }
         GUILayout.EndHorizontal();
 
+        //Resolution
+        GUILayout.BeginHorizontal();
+        EditorGUI.BeginDisabledGroup(true);
+        var x = EditorGUILayout.FloatField("Width", resolution.x);
+        var y = EditorGUILayout.FloatField("Height", resolution.y);
+        EditorGUI.EndDisabledGroup();
+        resolutionScale = EditorGUILayout.FloatField("Scale", resolutionScale);
+        GUILayout.EndHorizontal();
+
+        //Dof
+        GUILayout.BeginHorizontal();
+        EditorGUI.BeginChangeCheck();
+        rayTracingSystem.focusObject = EditorGUILayout.ObjectField("Focus Object", rayTracingSystem.focusObject, typeof(GameObject), true) as GameObject;
+        if (rayTracingSystem.focusObject != null && rayTracingSystem.camera != null)
+        {
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.FloatField("Focus",
+                Vector3.Distance(rayTracingSystem.focusObject.transform.position, rayTracingSystem.camera.transform.position));
+            EditorGUI.EndDisabledGroup();
+        }
+        else
+        {
+            rayTracingSystem.focus = EditorGUILayout.FloatField("Focus", rayTracingSystem.focus);
+        }
+        rayTracingSystem.circleOfConfusion = EditorGUILayout.FloatField("Circle", rayTracingSystem.circleOfConfusion);
+        if (EditorGUI.EndChangeCheck())
+        {
+            rayTracingSystem.needReset = true;
+        }
+        GUILayout.EndHorizontal();
+
+        //Sample
+        GUILayout.BeginHorizontal();
+        samplePerPixel = EditorGUILayout.IntSlider("SamplePerPixel", samplePerPixel, 1, 1000);
+        rayTracingSystem.bounces = EditorGUILayout.IntSlider("Bounces", rayTracingSystem.bounces, 1, 10);
+        GUILayout.EndHorizontal();
+        //Button
         GUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Sample Count", rayTracingSystem.sampleCount.ToString());
         if (GUILayout.Button("Reset"))
         {
-            rayTracingSystem.needReset += 1;
+            rayTracingSystem.needReset = true;
         }
         if (GUILayout.Button($"Interation ({samplePerPixel})"))
         {
@@ -150,65 +174,39 @@ public class RenderWindow : EditorWindow
 
     static UnityEngine.Vector3 positionLast;
     static UnityEngine.Quaternion quaternionLast;
-    static Vector3 lastSize;
+    static Vector3 lastResolution;
 
-    static float timeMax = 0.1f;
-    static float timeAdd;
     static void Upadte()
     {
-        if (camera)
+        if (rayTracingSystem.camera)
         {
-            if (camera.name == "SceneCamera")
-            {
-                resolution = new Vector2Int(
-                    (int) SceneView.lastActiveSceneView.position.width,
-                    (int) SceneView.lastActiveSceneView.position.height);
-            }
-            else
-            {
-                resolution = new Vector2Int(camera.pixelWidth, camera.pixelHeight);
-            }
+            resolution = new Vector2(rayTracingSystem.camera.pixelWidth, rayTracingSystem.camera.pixelHeight) * resolutionScale;
         }
 
-        if (!lastSize.IsApproximate(new Vector3(resolution.x, resolution.y, 0), 1))
+        if (!lastResolution.IsApproximate(new Vector3(resolution.x, resolution.y, 0), 1))
         {
-            lastSize = new Vector3(resolution.x, resolution.y, 0);
+            lastResolution = new Vector3(resolution.x, resolution.y, 0);
             rayTracingSystem.resolution = resolution;
             renderTexture = rayTracingSystem.ResetRenderTexture();
-            rayTracingSystem.needReset += 1;
+            rayTracingSystem.needReset = true;
+            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
         }
 
-        // timeAdd += 1 / 100.0f;
-        // if (timeAdd >= timeMax)
-        // {
-        //     timeAdd = 0;
-        //     Interation();
-        // }
-    }
-
-    void AngChanged()
-    {
-
+        if (!rayTracingSystem.camera.transform.position.IsApproximate(positionLast, 0.001f)
+            || !rayTracingSystem.camera.transform.rotation.IsApproximate(quaternionLast)
+        )
+        {
+            positionLast = rayTracingSystem.camera.transform.position;
+            quaternionLast = rayTracingSystem.camera.transform.rotation;
+            rayTracingSystem.needReset = true;
+            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+        }
     }
 
     static void Interation()
     {
-        if (camera != null && RayTracingComputeShader != null)
+        if (rayTracingSystem.camera != null && rayTracingSystem.RayTracingComputeShader != null)
         {
-            if (!camera.transform.position.IsApproximate(positionLast, 0.001f)
-                || !camera.transform.rotation.IsApproximate(quaternionLast)
-            )
-            {
-                positionLast = camera.transform.position;
-                quaternionLast = camera.transform.rotation;
-                rayTracingSystem.needReset += 1;
-            }
-
-            rayTracingSystem.RayTracingComputeShader = RayTracingComputeShader;
-            rayTracingSystem.camera = camera;
-            rayTracingSystem.resolution = resolution;
-            rayTracingSystem.skyBoxTexture = skyBoxTexture;
-            rayTracingSystem.bounces = bounces;
             renderTexture = rayTracingSystem.Render();
             UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
         }

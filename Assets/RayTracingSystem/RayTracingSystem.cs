@@ -18,9 +18,9 @@ public class RayTracingSystem
             return (int) kernalIndex;
         }
     }
-    public int samplePerPixel;
-    public int bounces;
-    public Vector2Int resolution = new Vector2Int(1280, 720);
+    public int samplePerPixel = 1;
+    public int bounces = 4;
+    public Vector2 resolution = new Vector2(1280, 720);
     public Texture2D skyBoxTexture;
     RenderTexture renderTextureAdd;
     RenderTexture GetRenderTextureAdd
@@ -29,7 +29,8 @@ public class RayTracingSystem
         {
             if (renderTextureAdd == null)
             {
-                renderTextureAdd = RenderTexture.GetTemporary(resolution.x, resolution.y, 0, RenderTextureFormat.ARGBFloat);
+                renderTextureAdd = RenderTexture.GetTemporary((int) resolution.x, (int) resolution.y, 0, RenderTextureFormat.ARGBFloat);
+                renderTextureAdd.filterMode = FilterMode.Point;
                 renderTextureAdd.enableRandomWrite = true;
                 renderTextureAdd.autoGenerateMips = false;
                 renderTextureAdd.Create();
@@ -45,7 +46,8 @@ public class RayTracingSystem
         {
             if (renderTextureOut == null)
             {
-                renderTextureOut = RenderTexture.GetTemporary(resolution.x, resolution.y, 0, RenderTextureFormat.ARGBFloat);
+                renderTextureOut = RenderTexture.GetTemporary((int) resolution.x, (int) resolution.y, 0, RenderTextureFormat.ARGBFloat);
+                renderTextureAdd.filterMode = FilterMode.Point;
                 renderTextureOut.enableRandomWrite = true;
                 renderTextureOut.autoGenerateMips = false;
                 renderTextureOut.Create();
@@ -54,7 +56,7 @@ public class RayTracingSystem
         }
     }
 
-    public int needReset = 0;
+    public bool needReset = false;
     public RenderTexture ResetRenderTexture()
     {
         if (renderTextureAdd != null) renderTextureAdd.Release();
@@ -67,6 +69,11 @@ public class RayTracingSystem
         return GetRenderTextureAdd;
     }
     public Camera camera;
+    //DOF
+    public float focus = 5;
+    public GameObject focusObject = null;
+    public float circleOfConfusion = 0;
+
     public int sampleCount = 0;
     //Scene
     //List<RayTracingEntity> RayTracingEntities = new List<RayTracingEntity>();
@@ -306,6 +313,10 @@ public class RayTracingSystem
 
     void SetShaderParameters()
     {
+        //Camera
+        RayTracingComputeShader.SetFloat("_CameraFar", camera.farClipPlane);
+        RayTracingComputeShader.SetFloat("_focus", focusObject?Vector3.Distance(focusObject.transform.position, camera.transform.position) : focus);
+        RayTracingComputeShader.SetFloat("_circleOfConfusion", circleOfConfusion);
         RayTracingComputeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         RayTracingComputeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
 
@@ -334,9 +345,7 @@ public class RayTracingSystem
         SetComputeBuffer("_MeshObjects", _meshObjectBuffer);
         SetComputeBuffer("_Vertices", _vertexBuffer);
         SetComputeBuffer("_Indices", _indexBuffer);
-
         RayTracingComputeShader.SetInt("_numMeshObjects", _meshObjectBuffer.count);
-        RayTracingComputeShader.SetFloat("_CameraFar", camera.farClipPlane);
     }
 
     private void SetComputeBuffer(string name, ComputeBuffer buffer)
@@ -354,16 +363,16 @@ public class RayTracingSystem
         {
             if (item.AnyChanged())
             {
-                needReset += 1;
+                needReset = true;
                 item.ResetChanged();
             }
         }
 
-        if (needReset > 0)
+        if (needReset)
         {
             SetupScene();
             ResetRenderTexture();
-            needReset = 0;
+            needReset = false;
         }
 
         SetShaderParameters();
@@ -380,5 +389,4 @@ public class RayTracingSystem
         int threadGroupsY = Mathf.CeilToInt(GetRenderTextureAdd.height / 8);
         RayTracingComputeShader.Dispatch(KERNALINDEX, threadGroupsX, threadGroupsY, 1);
     }
-
 }
