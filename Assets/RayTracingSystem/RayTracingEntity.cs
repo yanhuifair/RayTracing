@@ -21,15 +21,14 @@ public class RayTracingEntity : MonoBehaviour
     // }
 
     [OnValueChanged("AttributeChanged")][EnumToggleButtons] public EntityType entityType;
-    [Header("Sphere")]
     [OnValueChanged("AttributeChanged")][ShowIf("entityType", EntityType.Sphere)] public float radius = 1;
     [OnValueChanged("AttributeChanged")][ShowIf("entityType", EntityType.Box)] public Vector3 boxSize = Vector3.one;
 
-    [Header("Render")]
-    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, true)] public Color albedo = Color.gray;
-    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, true)] public Color specular = Color.gray;
-    [OnValueChanged("AttributeChanged")][Range(0, 1)] public float smoothness;
-    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, true)] public Color emission;
+    [Title("Render")]
+    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, false)] public Color albedo = Color.white;
+    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, false)] public Color specular = Color.black;
+    [OnValueChanged("AttributeChanged")][Range(0, 1)] public float smoothness = 0;
+    [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, true)] public Color emission = Color.black;
 
     [ReadOnly][SerializeField] bool attributeChanged = false;
     public void AttributeChanged()
@@ -47,4 +46,16 @@ public class RayTracingEntity : MonoBehaviour
         transform.hasChanged = false;
         attributeChanged = false;
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(GetBounds().center, GetBounds().size);
+    }
+
+    public Bounds GetBounds()
+    {
+        var bounds = transform.GetComponent<MeshRenderer>().bounds;
+        return bounds;
+    }
+
 }

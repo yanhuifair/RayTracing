@@ -27,7 +27,7 @@ public class RenderWindow : EditorWindow
         }
     }
 
-    static string path;
+    static string path = "/Users/fairimac/Desktop";
 
     [MenuItem("Ray Tracing/Render Window")]
     static void Init()
@@ -81,7 +81,7 @@ public class RenderWindow : EditorWindow
                 if (cameras[i] != null) cameraNames[i] = cameras[i].name;
             }
             EditorGUI.BeginChangeCheck();
-            cameraIndex = EditorGUILayout.Popup(cameraIndex, cameraNames, GUILayout.Width(position.width / 2 - spacing * 2));
+            cameraIndex = EditorGUILayout.Popup(cameraIndex, cameraNames, GUILayout.Width(position.width / 2 - spacing * 3));
             if (EditorGUI.EndChangeCheck())
             {
                 rayTracingSystem.camera = cameras[cameraIndex];
@@ -96,7 +96,7 @@ public class RenderWindow : EditorWindow
         var x = EditorGUILayout.FloatField("Width", resolution.x);
         var y = EditorGUILayout.FloatField("Height", resolution.y);
         EditorGUI.EndDisabledGroup();
-        resolutionScale = EditorGUILayout.FloatField("Scale", resolutionScale);
+        resolutionScale = EditorGUILayout.Slider("Scale", resolutionScale, 0.1f, 2f);
         GUILayout.EndHorizontal();
 
         //Dof
@@ -114,7 +114,7 @@ public class RenderWindow : EditorWindow
         {
             rayTracingSystem.focus = EditorGUILayout.FloatField("Focus", rayTracingSystem.focus);
         }
-        rayTracingSystem.circleOfConfusion = EditorGUILayout.FloatField("Circle", rayTracingSystem.circleOfConfusion);
+        rayTracingSystem.circleOfConfusion = EditorGUILayout.Slider("Circle", rayTracingSystem.circleOfConfusion, 0, 1);
         if (EditorGUI.EndChangeCheck())
         {
             rayTracingSystem.needReset = true;
@@ -123,17 +123,18 @@ public class RenderWindow : EditorWindow
 
         //Sample
         GUILayout.BeginHorizontal();
-        samplePerPixel = EditorGUILayout.IntSlider("SamplePerPixel", samplePerPixel, 1, 1000);
+        samplePerPixel = EditorGUILayout.IntSlider("Sample Per Pixel", samplePerPixel, 1, 1000);
         rayTracingSystem.bounces = EditorGUILayout.IntSlider("Bounces", rayTracingSystem.bounces, 1, 10);
         GUILayout.EndHorizontal();
+
         //Button
         GUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Sample Count", rayTracingSystem.sampleCount.ToString());
-        if (GUILayout.Button("Reset"))
+        EditorGUILayout.LabelField("Sample Count: " + rayTracingSystem.sampleCount.ToString(), GUILayout.Width(position.width / 4 - spacing * 2));
+        if (GUILayout.Button("Reset", GUILayout.Width(position.width / 4 - spacing * 2)))
         {
             rayTracingSystem.needReset = true;
         }
-        if (GUILayout.Button($"Interation ({samplePerPixel})"))
+        if (GUILayout.Button($"Interation ({samplePerPixel})", GUILayout.Width(position.width / 4 - spacing * 2)))
         {
             rayTracingSystem.samplePerPixel = samplePerPixel;
             Interation();
@@ -145,20 +146,22 @@ public class RenderWindow : EditorWindow
         }
         GUILayout.EndHorizontal();
 
+        //Texture
         #region Texture
         if (renderTexture)
         {
             var ratio = (float) renderTexture.width / renderTexture.height;
             var TextureRect = new Rect(
-                spacing, position.height - position.width / ratio - singleLineHeight - spacing,
+                spacing, singleLineHeight * 6 + spacing * 9,
                 (position.width - spacing * 2), (position.width - spacing * 2) / ratio);
 
             EditorGUI.DrawPreviewTexture(TextureRect, renderTexture);
         }
         #endregion
 
+        //Save
         #region Save
-        EditorGUI.LabelField(new Rect(spacing, position.height - singleLineHeight - spacing, (position.width - spacing * 2) / 3, singleLineHeight), "", path);
+        EditorGUI.TextField(new Rect(spacing, position.height - singleLineHeight - spacing, (position.width - spacing * 4) / 3 - spacing, singleLineHeight), "", path);
         if (GUI.Button(new Rect((position.width - spacing * 2) / 3, position.height - singleLineHeight - spacing, (position.width - spacing * 2) / 3, singleLineHeight), "Browse"))
         {
             path = EditorUtility.SaveFolderPanel("Path to Save Images", path, Application.dataPath);
@@ -192,14 +195,17 @@ public class RenderWindow : EditorWindow
             UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
         }
 
-        if (!rayTracingSystem.camera.transform.position.IsApproximate(positionLast, 0.001f)
-            || !rayTracingSystem.camera.transform.rotation.IsApproximate(quaternionLast)
-        )
+        if (rayTracingSystem.camera)
         {
-            positionLast = rayTracingSystem.camera.transform.position;
-            quaternionLast = rayTracingSystem.camera.transform.rotation;
-            rayTracingSystem.needReset = true;
-            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+            if (!rayTracingSystem.camera.transform.position.IsApproximate(positionLast, 0.001f)
+                || !rayTracingSystem.camera.transform.rotation.IsApproximate(quaternionLast)
+            )
+            {
+                positionLast = rayTracingSystem.camera.transform.position;
+                quaternionLast = rayTracingSystem.camera.transform.rotation;
+                rayTracingSystem.needReset = true;
+                UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+            }
         }
     }
 

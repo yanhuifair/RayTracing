@@ -98,7 +98,7 @@ struct RayHit
 
 float2 _Pixel;
 float _Seed;
-StructuredBuffer<float> _Random;
+StructuredBuffer<float> _randomBuffer;
 float rand()
 {
     float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
@@ -476,10 +476,14 @@ void CSMain(uint3 id: SV_DispatchThreadID)
         Ray fogRay = ray;
         float screenDepth = 0;
         float3 sceneColor = SceneColor(sceneRay, screenDepth);
-        float3 fogColor = FogColor(fogRay, screenDepth);
+        //float3 fogColor = FogColor(fogRay, screenDepth);
         final += sceneColor;
-        final += fogColor ;
+        //final += fogColor ;
         //final /= 2;
+        
+        
+        //Random
+        _Seed = _randomBuffer[spp];
     }
     
     //Apply gamma correction

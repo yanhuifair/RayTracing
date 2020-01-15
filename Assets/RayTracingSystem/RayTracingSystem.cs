@@ -93,12 +93,12 @@ public class RayTracingSystem
         if (boxBuffer != null)
             boxBuffer.Release();
 
-        if (_meshObjectBuffer != null)
-            _meshObjectBuffer.Release();
-        if (_vertexBuffer != null)
-            _vertexBuffer.Release();
-        if (_indexBuffer != null)
-            _indexBuffer.Release();
+        if (meshObjectBuffer != null)
+            meshObjectBuffer.Release();
+        if (vertexBuffer != null)
+            vertexBuffer.Release();
+        if (indexBuffer != null)
+            indexBuffer.Release();
     }
 
     void SetupScene()
@@ -226,9 +226,9 @@ public class RayTracingSystem
     private List<MeshObject> _meshObjects = new List<MeshObject>();
     private List<Vector3> _vertices = new List<Vector3>();
     private List<int> _indices = new List<int>();
-    private ComputeBuffer _meshObjectBuffer;
-    private ComputeBuffer _vertexBuffer;
-    private ComputeBuffer _indexBuffer;
+    private ComputeBuffer meshObjectBuffer;
+    private ComputeBuffer vertexBuffer;
+    private ComputeBuffer indexBuffer;
     private void RebuildMeshObjectBuffers()
     {
         // Clear all lists
@@ -272,9 +272,9 @@ public class RayTracingSystem
         }
         unsafe
         {
-            CreateComputeBuffer(ref _meshObjectBuffer, _meshObjects, sizeof(MeshObject));
-            CreateComputeBuffer(ref _vertexBuffer, _vertices, sizeof(Vector3));
-            CreateComputeBuffer(ref _indexBuffer, _indices, sizeof(int));
+            CreateComputeBuffer(ref meshObjectBuffer, _meshObjects, sizeof(MeshObject));
+            CreateComputeBuffer(ref vertexBuffer, _vertices, sizeof(Vector3));
+            CreateComputeBuffer(ref indexBuffer, _indices, sizeof(int));
         }
     }
     void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride)
@@ -305,10 +305,16 @@ public class RayTracingSystem
         }
     }
 
-    private ComputeBuffer _randomBuffer;
-    void SetupRandom()
+    private ComputeBuffer randomBuffer;
+    List<float> randList = new List<float>();
+    void SetupRandom(int samplePerPixel)
     {
-
+        randList.Clear();
+        for (int i = 0; i < samplePerPixel; i++)
+        {
+            randList.Add(UnityEngine.Random.value);
+        }
+        CreateComputeBuffer(ref randomBuffer, randList, sizeof(float));
     }
 
     void SetShaderParameters()
@@ -328,6 +334,9 @@ public class RayTracingSystem
 
         RayTracingComputeShader.SetInt("_bounces", bounces);
         RayTracingComputeShader.SetInt("_SamplePerPixel", samplePerPixel);
+
+        SetupRandom(samplePerPixel);
+        RayTracingComputeShader.SetBuffer(KERNALINDEX, "_randomBuffer", randomBuffer);
         RayTracingComputeShader.SetFloat("_Seed", UnityEngine.Random.value);
 
         sampleCount += samplePerPixel;
@@ -342,10 +351,10 @@ public class RayTracingSystem
         RayTracingComputeShader.SetInt("_numBoxs", boxBuffer.count);
 
         //mesh
-        SetComputeBuffer("_MeshObjects", _meshObjectBuffer);
-        SetComputeBuffer("_Vertices", _vertexBuffer);
-        SetComputeBuffer("_Indices", _indexBuffer);
-        RayTracingComputeShader.SetInt("_numMeshObjects", _meshObjectBuffer.count);
+        SetComputeBuffer("_MeshObjects", meshObjectBuffer);
+        SetComputeBuffer("_Vertices", vertexBuffer);
+        SetComputeBuffer("_Indices", indexBuffer);
+        RayTracingComputeShader.SetInt("_numMeshObjects", meshObjectBuffer.count);
     }
 
     private void SetComputeBuffer(string name, ComputeBuffer buffer)
