@@ -213,6 +213,8 @@ public class RayTracingSystem
     //mesh 
     struct MeshObject
     {
+        public Vector3 position;
+        public Vector3 boundsSize;
         public Matrix4x4 localToWorldMatrix;
         public int indices_offset;
         public int indices_count;
@@ -259,7 +261,9 @@ public class RayTracingSystem
                 // Add the object itself
                 _meshObjects.Add(new MeshObject()
                 {
-                    localToWorldMatrix = item.transform.localToWorldMatrix,
+                    position = item.transform.position,
+                        boundsSize = item.GetBounds().size,
+                        localToWorldMatrix = item.transform.localToWorldMatrix,
                         indices_offset = firstIndex,
                         indices_count = indices.Length,
 
