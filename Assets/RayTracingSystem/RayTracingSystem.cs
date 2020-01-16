@@ -15,6 +15,7 @@ public class RayTracingSystem
             if (computeShader == null)
             {
                 ComputeShader[] computeShaders = (ComputeShader[]) Resources.FindObjectsOfTypeAll(typeof(ComputeShader));
+
                 for (int i = 0; i < computeShaders.Length; i++)
                 {
                     if (computeShaders[i].name == "RayTracingComputeShader")
@@ -139,7 +140,6 @@ public class RayTracingSystem
         GameObjectUtility.SetParentAndAlign(obj, menuCommand.context as GameObject);
         Undo.RegisterCreatedObjectUndo(obj, "Create" + obj.name);
         Selection.activeObject = obj;
-
     }
 
     public void Release()
@@ -195,10 +195,7 @@ public class RayTracingSystem
         public Vector3 position;
         public Vector3 rotation;
         public float radius;
-        public Vector3 albedo;
-        public Vector3 specular;
-        public float smoothness;
-        public Vector3 emission;
+        public int materialIndex;
     };
     ComputeBuffer sphereBuffer;
     public List<SphereInfo> spheres = new List<SphereInfo>();
@@ -209,15 +206,13 @@ public class RayTracingSystem
         {
             if (item.entityType == RayTracingEntity.EntityType.Sphere && item.gameObject.activeInHierarchy == true)
             {
-                var sphere = new SphereInfo();
-                sphere.position = item.transform.position;
-                sphere.rotation = item.transform.rotation.eulerAngles;
-                sphere.radius = item.radius / 2.0f;
-                sphere.albedo = ColorToVector3(item.albedo);
-                sphere.specular = ColorToVector3(item.specular);
-                sphere.smoothness = item.smoothness;
-                sphere.emission = ColorToVector3(item.emission);
-                spheres.Add(sphere);
+                spheres.Add(new SphereInfo()
+                {
+                    position = item.transform.position,
+                        rotation = item.transform.rotation.eulerAngles,
+                        radius = item.radius / 2.0f,
+                        materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
+                });
             }
         }
         if (sphereBuffer != null)
@@ -231,6 +226,7 @@ public class RayTracingSystem
         sphereBuffer = new ComputeBuffer(spheres.Count == 0 ? CreateEmtpySpheres() : spheres.Count, stride);
         sphereBuffer.SetData(spheres);
     }
+
     int CreateEmtpySpheres()
     {
         spheres.Add(new SphereInfo());
@@ -244,10 +240,7 @@ public class RayTracingSystem
         public Vector3 position;
         public Vector3 rotation;
         public Vector3 size;
-        public Vector3 albedo;
-        public Vector3 specular;
-        public float smoothness;
-        public Vector3 emission;
+        public int materialIndex;
     };
     ComputeBuffer boxBuffer;
     public List<BoxInfo> boxs = new List<BoxInfo>();
@@ -258,17 +251,15 @@ public class RayTracingSystem
         {
             if (item.entityType == RayTracingEntity.EntityType.Box && item.gameObject.activeInHierarchy == true)
             {
-                var box = new BoxInfo();
                 Matrix4x4 matrix4X4 = Matrix4x4.TRS(item.transform.position, item.transform.rotation, item.transform.lossyScale);
-                box.localToWorldMatrix = matrix4X4;
-                box.position = item.transform.position;
-                box.rotation = item.transform.rotation.eulerAngles;
-                box.size = item.boxSize;
-                box.albedo = ColorToVector3(item.albedo);
-                box.specular = ColorToVector3(item.specular);
-                box.smoothness = item.smoothness;
-                box.emission = ColorToVector3(item.emission);
-                boxs.Add(box);
+                boxs.Add(new BoxInfo()
+                {
+                    localToWorldMatrix = matrix4X4,
+                        position = item.transform.position,
+                        rotation = item.transform.rotation.eulerAngles,
+                        size = item.boxSize,
+                        materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
+                });
             }
         }
         if (boxBuffer != null)
@@ -289,7 +280,7 @@ public class RayTracingSystem
     }
 
     //mesh 
-    struct MeshObject
+    public struct MeshObject
     {
         public Vector3 position;
         public Vector3 boundsSize;
@@ -297,10 +288,8 @@ public class RayTracingSystem
         public int indices_offset;
         public int indices_count;
 
-        public Vector3 albedo;
-        public Vector3 specular;
-        public float smoothness;
-        public Vector3 emission;
+        //Material
+        public int materialIndex;
     };
 
     private List<MeshObject> _meshObjects = new List<MeshObject>();
@@ -344,11 +333,7 @@ public class RayTracingSystem
                         localToWorldMatrix = item.transform.localToWorldMatrix,
                         indices_offset = firstIndex,
                         indices_count = indices.Length,
-
-                        albedo = ColorToVector3(item.albedo),
-                        specular = ColorToVector3(item.specular),
-                        smoothness = item.smoothness,
-                        emission = ColorToVector3(item.emission),
+                        materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
                 });
             }
         }
@@ -399,6 +384,49 @@ public class RayTracingSystem
         CreateComputeBuffer(ref randomBuffer, randList, sizeof(float));
     }
 
+    public struct MaterialInfo
+    {
+        //public Texture2D texture2D;
+        public Vector3 albedo;
+        public Vector3 specular;
+        public float smoothness;
+        public Vector3 emission;
+    };
+
+    ComputeBuffer materialInfoBuffer;
+    List<MaterialInfo> materialInfos = new List<MaterialInfo>();
+    List<RayTracingMaterial> raytracingMaterials = new List<RayTracingMaterial>();
+
+    void SetupMaterials()
+    {
+        raytracingMaterials.Clear();
+        materialInfos.Clear();
+        foreach (var item in RayTracingEntities)
+        {
+            if (item.rayTracingMaterial == null) continue;
+            if (raytracingMaterials.Contains(item.rayTracingMaterial)) continue;
+            raytracingMaterials.Add(item.rayTracingMaterial);
+        }
+
+        foreach (var item in raytracingMaterials)
+        {
+            MaterialInfo materialInfo = new MaterialInfo();
+            //materialInfo.texture2D = item.texture2D;
+            materialInfo.albedo = ColorToVector3(item.albedo);
+            materialInfo.specular = ColorToVector3(item.specular);
+            materialInfo.smoothness = item.smoothness;
+            materialInfo.emission = ColorToVector3(item.emission);
+            materialInfos.Add(materialInfo);
+        }
+
+        unsafe
+        {
+            int size = sizeof(MaterialInfo);
+            // int size = sizeof(Vector3) + sizeof(Vector3) + sizeof(float) + +sizeof(Vector3);
+            CreateComputeBuffer(ref materialInfoBuffer, materialInfos, size);
+        }
+    }
+
     void SetShaderParameters()
     {
         //Camera
@@ -437,6 +465,9 @@ public class RayTracingSystem
         SetComputeBuffer("_Vertices", vertexBuffer);
         SetComputeBuffer("_Indices", indexBuffer);
         RayTracingComputeShader.SetInt("_numMeshObjects", meshObjectBuffer.count);
+
+        //Material
+        SetComputeBuffer("_materialBuffer", materialInfoBuffer);
     }
 
     private void SetComputeBuffer(string name, ComputeBuffer buffer)
@@ -461,6 +492,7 @@ public class RayTracingSystem
 
         if (needReset)
         {
+            SetupMaterials();
             SetupScene();
             ResetRenderTexture();
             needReset = false;

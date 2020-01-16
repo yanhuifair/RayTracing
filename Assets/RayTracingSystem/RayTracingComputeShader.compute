@@ -31,11 +31,7 @@ struct Sphere
     float3 position;
     float3 rotation;
     float radius;
-    
-    float3 albedo;
-    float3 specular;
-    float smoothness;
-    float3 emission;
+    int materialIndex;
 };
 StructuredBuffer<Sphere> _Spheres;
 uint _numSpheres;
@@ -47,11 +43,7 @@ struct Box
     float3 position;
     float3 rotation;
     float3 size;
-    
-    float3 albedo;
-    float3 specular;
-    float smoothness;
-    float3 emission;
+    int materialIndex;
 };
 StructuredBuffer<Box> _Boxs;
 uint _numBoxs;
@@ -64,17 +56,25 @@ struct MeshObject
     float4x4 localToWorldMatrix;
     int indices_offset;
     int indices_count;
-    
-    float3 albedo;
-    float3 specular;
-    float smoothness;
-    float3 emission;
+    int materialIndex;
 };
 uint _numMeshObjects;
 
 StructuredBuffer<MeshObject> _MeshObjects;
 StructuredBuffer<float3> _Vertices;
 StructuredBuffer<int> _Indices;
+
+
+
+struct MaterialInfo
+{
+    //Texture2D texture2D;
+    float3 albedo;
+    float3 specular;
+    float smoothness;
+    float3 emission;
+};
+StructuredBuffer<MaterialInfo> _materialBuffer;
 
 struct Ray
 {
@@ -173,13 +173,15 @@ void IntersectSphere(Ray ray, inout RayHit hit, Sphere sphere)
     float t = p1 - p2 > 0 ? p1 - p2: p1 + p2;
     if(t > 0 && t < hit.distance)
     {
+        MaterialInfo materialInfo = _materialBuffer[sphere.materialIndex];
+        
         hit.distance = t;
         hit.position = ray.origin + t * ray.direction;
         hit.normal = normalize(hit.position - sphere.position);
-        hit.albedo = sphere.albedo;
-        hit.specular = sphere.specular;
-        hit.smoothness = sphere.smoothness;
-        hit.emission = sphere.emission;
+        hit.albedo = materialInfo.albedo;
+        hit.specular = materialInfo.specular;
+        hit.smoothness = materialInfo.smoothness;
+        hit.emission = materialInfo.emission;
         hit.hited = true;
     }
 }
@@ -206,13 +208,15 @@ void IntersectionBox(Ray ray, inout RayHit hit, Box box)
     {
         if (t > 0 && t < _CameraFar && t < hit.distance)
         {
+            MaterialInfo materialInfo = _materialBuffer[box.materialIndex];
+            
             hit.distance = t;
             hit.position = ray.origin + t * ray.direction;
             hit.normal = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);
-            hit.albedo = box.albedo;
-            hit.specular = box.specular;
-            hit.smoothness = box.smoothness;
-            hit.emission = box.emission;
+            hit.albedo = materialInfo.albedo;
+            hit.specular = materialInfo.specular;
+            hit.smoothness = materialInfo.smoothness;
+            hit.emission = materialInfo.emission;
             hit.hited = true;
         }
     }
@@ -302,13 +306,15 @@ void IntersectMeshObject(Ray ray, inout RayHit hit, MeshObject meshObject)
         {
             if(t > 0 && t < _CameraFar && t < hit.distance)
             {
+                MaterialInfo materialInfo = _materialBuffer[meshObject.materialIndex];
+                
                 hit.distance = t;
                 hit.position = ray.origin + t * ray.direction;
                 hit.normal = normalize(cross(v1 - v0, v2 - v0));
-                hit.albedo = meshObject.albedo;
-                hit.specular = meshObject.specular;
-                hit.smoothness = meshObject.smoothness;
-                hit.emission = meshObject.emission;
+                hit.albedo = materialInfo.albedo;
+                hit.specular = materialInfo.specular;
+                hit.smoothness = materialInfo.smoothness;
+                hit.emission = materialInfo.emission;
                 hit.hited = true;
             }
         }
