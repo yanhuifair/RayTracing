@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class RenderWindow : EditorWindow
+public class RayTracingWindow : EditorWindow
 {
     static int samplePerPixel = 1;
     static Vector2 resolution = new Vector2(1280, 720);
@@ -18,12 +20,16 @@ public class RenderWindow : EditorWindow
 
     static RayTracingSystem rayTracingSystem = new RayTracingSystem();
 
-    static RenderWindow window;
-    static RenderWindow WINDOW
+    static RayTracingWindow window;
+    static RayTracingWindow WINDOW
     {
         get
         {
-            if (window == null) window = (RenderWindow) EditorWindow.GetWindow(typeof(RenderWindow));
+            if (window == null)
+            {
+                window = (RayTracingWindow) EditorWindow.GetWindow(typeof(RayTracingWindow));
+                window.titleContent = new GUIContent("Ray Tracing Render");
+            }
             return window;
         }
     }
@@ -39,6 +45,7 @@ public class RenderWindow : EditorWindow
     private void OnEnable()
     {
         EditorApplication.update += Upadte;
+        RefreshCameras();
     }
 
     private void OnDisable()
@@ -47,13 +54,29 @@ public class RenderWindow : EditorWindow
         rayTracingSystem.Release();
     }
 
+    void RefreshCameras()
+    {
+        cameras.Clear();
+
+        var camerasFinded = Resources.FindObjectsOfTypeAll(typeof(Camera)) as Camera[];
+        foreach (var camera in camerasFinded)
+        {
+            if (camera.gameObject.scene == null) continue;
+            if (camera.gameObject.name == "Preview Scene Camera") continue;
+            if (cameras.Contains(camera)) continue;
+
+            cameras.Add(camera);
+            if (rayTracingSystem.camera == null) rayTracingSystem.camera = camera;
+        }
+    }
+
     void OnGUI()
     {
         float spacing = EditorGUIUtility.standardVerticalSpacing;
         float singleLineHeight = EditorGUIUtility.singleLineHeight;
 
         GUILayout.BeginHorizontal();
-        rayTracingSystem.RayTracingComputeShader = EditorGUILayout.ObjectField("ComputeShader", rayTracingSystem.RayTracingComputeShader, typeof(ComputeShader), false) as ComputeShader;
+        //rayTracingSystem.computeShader = EditorGUILayout.ObjectField("Compute Shader", rayTracingSystem.computeShader, typeof(ComputeShader), false) as ComputeShader;
         rayTracingSystem.skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", rayTracingSystem.skyBoxTexture, typeof(UnityEngine.Object), false) as Texture2D;
         GUILayout.EndHorizontal();
 
@@ -61,18 +84,7 @@ public class RenderWindow : EditorWindow
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Refresh Cameras"))
         {
-            cameras.Clear();
-
-            var camerasFinded = Resources.FindObjectsOfTypeAll(typeof(Camera)) as Camera[];
-            foreach (var camera in camerasFinded)
-            {
-                if (camera.gameObject.scene == null) continue;
-                if (camera.gameObject.name == "Preview Scene Camera") continue;
-                if (cameras.Contains(camera)) continue;
-
-                cameras.Add(camera);
-                if (rayTracingSystem.camera == null) rayTracingSystem.camera = camera;
-            }
+            RefreshCameras();
         }
         if (cameras.Count > 0)
         {
@@ -115,7 +127,7 @@ public class RenderWindow : EditorWindow
         {
             rayTracingSystem.focus = EditorGUILayout.FloatField("Focus", rayTracingSystem.focus);
         }
-        rayTracingSystem.circleOfConfusion = EditorGUILayout.Slider("Circle", rayTracingSystem.circleOfConfusion, 0, 1);
+        rayTracingSystem.circleOfConfusion = EditorGUILayout.Slider("Circle", rayTracingSystem.circleOfConfusion, 0, 0.2f);
         if (EditorGUI.EndChangeCheck())
         {
             rayTracingSystem.needReset = true;
@@ -185,37 +197,37 @@ public class RenderWindow : EditorWindow
         if (rayTracingSystem.camera)
         {
             resolution = new Vector2(rayTracingSystem.camera.pixelWidth, rayTracingSystem.camera.pixelHeight) * resolutionScale;
-        }
 
-        if (!lastResolution.IsApproximate(new Vector3(resolution.x, resolution.y, 0), 1))
-        {
-            lastResolution = new Vector3(resolution.x, resolution.y, 0);
-            rayTracingSystem.resolution = resolution;
-            renderTexture = rayTracingSystem.ResetRenderTexture();
-            rayTracingSystem.needReset = true;
-            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-        }
+            if (!lastResolution.IsApproximate(new Vector3(resolution.x, resolution.y, 0), 1))
+            {
+                lastResolution = new Vector3(resolution.x, resolution.y, 0);
+                rayTracingSystem.resolution = resolution;
+                renderTexture = rayTracingSystem.ResetRenderTexture();
+                rayTracingSystem.needReset = true;
+                UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+            }
 
-        if (rayTracingSystem.camera)
-        {
             if (!rayTracingSystem.camera.transform.position.IsApproximate(positionLast, 0.001f)
-                || !rayTracingSystem.camera.transform.rotation.IsApproximate(quaternionLast)
-            )
+                || !rayTracingSystem.camera.transform.rotation.IsApproximate(quaternionLast))
             {
                 positionLast = rayTracingSystem.camera.transform.position;
                 quaternionLast = rayTracingSystem.camera.transform.rotation;
                 rayTracingSystem.needReset = true;
-                UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+
+                // rayTracingSystem.samplePerPixel = 1;
+                // renderTexture = rayTracingSystem.Render();
+                // WINDOW.Repaint();
             }
         }
     }
 
     static void Interation()
     {
-        if (rayTracingSystem.camera != null && rayTracingSystem.RayTracingComputeShader != null)
+        if (rayTracingSystem.camera != null)
         {
             renderTexture = rayTracingSystem.Render();
-            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+            WINDOW.Repaint();
+            //UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
         }
     }
 }

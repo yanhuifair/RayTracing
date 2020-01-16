@@ -13,14 +13,8 @@ public class RayTracingEntity : MonoBehaviour
         Sphere,
         Box
     }
-    // private void OnEnable()
-    // {
-    //     var list = GameObject.FindObjectOfType<RayTracingCamera>().RayTracingEntities;
-    //     if (!list.Contains(this))
-    //         list.Add(this);
-    // }
 
-    [OnValueChanged("AttributeChanged")][EnumToggleButtons] public EntityType entityType;
+    [OnValueChanged("AttributeChanged")][EnumToggleButtons] public EntityType entityType = EntityType.Sphere;
     [OnValueChanged("AttributeChanged")][ShowIf("entityType", EntityType.Sphere)] public float radius = 1;
     [OnValueChanged("AttributeChanged")][ShowIf("entityType", EntityType.Box)] public Vector3 boxSize = Vector3.one;
 
@@ -30,7 +24,10 @@ public class RayTracingEntity : MonoBehaviour
     [OnValueChanged("AttributeChanged")][Range(0, 1)] public float smoothness = 0;
     [OnValueChanged("AttributeChanged")][ColorUsageAttribute(false, true)] public Color emission = Color.black;
 
+    public RayTracingMaterial rayTracingMaterial;
+
     [ReadOnly][SerializeField] bool attributeChanged = false;
+
     public void AttributeChanged()
     {
         attributeChanged = true;
@@ -49,12 +46,16 @@ public class RayTracingEntity : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(GetBounds().center, GetBounds().size);
+        if (entityType == EntityType.Mesh && GetBounds() != null)
+        {
+            Gizmos.DrawWireCube(((Bounds) GetBounds()).center, ((Bounds) GetBounds()).size);
+        }
     }
 
-    public Bounds GetBounds()
+    public Bounds? GetBounds()
     {
-        var bounds = transform.GetComponent<MeshRenderer>().bounds;
+        var bounds = transform.GetComponent<MeshRenderer>()?.bounds;
+        //bounds = transform.GetComponent<MeshFilter>()?.mesh?.bounds;
         return bounds;
     }
 

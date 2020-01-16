@@ -100,12 +100,12 @@ struct RayHit
 
 
 float2 _Pixel;
-float _Seed;
+float _seed;
 StructuredBuffer<float> _randomBuffer;
 float rand()
 {
-    float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
-    _Seed += 1.0f;
+    float result = frac(sin(_seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
+    _seed += 1.0f;
     return result;
 }
 
@@ -352,167 +352,167 @@ RayHit Trace(Ray ray)
     // Trace ground plane
     //IntersectGroundPlane(ray, bestHit);
     
-    // // Trace spheres
-    // for (i = 0; i < _numSpheres; i ++)
-    // {
-        //     //IntersectSphere(ray, bestHit, _Spheres[i]);
-        // }
+    // Trace spheres
+    for (i = 0; i < _numSpheres; i ++)
+    {
+        IntersectSphere(ray, bestHit, _Spheres[i]);
+    }
+    
+    // Trace Box
+    //for (i = 0; i < _numBoxs; i ++)
+    {
+        //IntersectionBox(ray, bestHit, _Boxs[i]);
+    }
+    
+    Ray boundRay = ray;
+    RayHit boundHit = bestHit;
+    for (i = 0; i < _numMeshObjects; i ++)
+    {
+        if (IntersectMeshObjectBounds(boundRay, boundHit, _MeshObjects[i]))
+        {
+            IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+        }
+    }
+    
+    return bestHit;
+}
+
+float sdot(float3 x, float3 y, float f = 1.0f)
+{
+    return saturate(dot(x, y) * f);
+}
+float energy(float3 color)
+{
+    return dot(color, 1.0f / 3.0f);
+}
+float SmoothnessToPhongAlpha(float s)
+{
+    return pow(1000000.0f, s * s);
+}
+float3 Shade(inout Ray ray, RayHit hit)
+{
+    if(hit.hited)
+    {
+        hit.albedo = min(1.0f - hit.specular, hit.albedo);
+        float specChance = energy(hit.specular);
+        float diffChance = energy(hit.albedo);
+        float sum = specChance + diffChance;
+        specChance /= sum;
+        diffChance /= sum;
+        // Roulette-select the ray's path
+        float roulette = rand();
+        if (roulette < specChance)
+        {
+            // Specular reflection
+            float alpha = SmoothnessToPhongAlpha(hit.smoothness);
+            ray.origin = hit.position + hit.normal * 0.001f;
+            ray.direction = SampleHemisphere(reflect(ray.direction, hit.normal), alpha);
+            float f = (alpha + 2) / (alpha + 1);
+            ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
+        }
+        else if (diffChance > 0 && roulette < specChance + diffChance)
+        {
+            // Diffuse reflection
+            ray.origin = hit.position + hit.normal * 0.001f;
+            ray.direction = SampleHemisphere(hit.normal, 1.0f);
+            ray.energy *= (1.0f / diffChance) * hit.albedo;
+        }
+        else
+        {
+            // Terminate ray
+            ray.energy = 0.0f;
+        }
+        return hit.emission;
+    }
+    else
+    {
+        // Erase the ray's energy - the sky doesn't reflect anything
+        ray.energy = 0.0f;
         
-        // // Trace Box
-        // for (i = 0; i < _numBoxs; i ++)
-        // {
-            //     //IntersectionBox(ray, bestHit, _Boxs[i]);
-            // }
-            
-            Ray boundRay = ray;
-            RayHit boundHit = bestHit;
-            for (i = 0; i < _numMeshObjects; i ++)
+        // Sample the skybox and write it
+        float theta = acos(ray.direction.y) / - PI;
+        float phi = atan2(ray.direction.x, -ray.direction.z) / - PI * 0.5f;
+        return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
+    }
+}
+
+float3 SceneColor(Ray ray, inout float screenDepth)
+{
+    float3 sceneColor = float3(0, 0, 0);
+    for (uint i = 0; i < _bounces; i ++)
+    {
+        RayHit hit = Trace(ray);
+        if (hit.hited)
+        {
+            if(i == 0)
             {
-                if (IntersectMeshObjectBounds(boundRay, boundHit, _MeshObjects[i]))
-                {
-                    IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
-                }
-            }
-            
-            return bestHit;
-        }
-        
-        float sdot(float3 x, float3 y, float f = 1.0f)
-        {
-            return saturate(dot(x, y) * f);
-        }
-        float energy(float3 color)
-        {
-            return dot(color, 1.0f / 3.0f);
-        }
-        float SmoothnessToPhongAlpha(float s)
-        {
-            return pow(1000000.0f, s * s);
-        }
-        float3 Shade(inout Ray ray, RayHit hit)
-        {
-            if(hit.hited)
-            {
-                hit.albedo = min(1.0f - hit.specular, hit.albedo);
-                float specChance = energy(hit.specular);
-                float diffChance = energy(hit.albedo);
-                float sum = specChance + diffChance;
-                specChance /= sum;
-                diffChance /= sum;
-                // Roulette-select the ray's path
-                float roulette = rand();
-                if (roulette < specChance)
-                {
-                    // Specular reflection
-                    float alpha = SmoothnessToPhongAlpha(hit.smoothness);
-                    ray.origin = hit.position + hit.normal * 0.001f;
-                    ray.direction = SampleHemisphere(reflect(ray.direction, hit.normal), alpha);
-                    float f = (alpha + 2) / (alpha + 1);
-                    ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
-                }
-                else if (diffChance > 0 && roulette < specChance + diffChance)
-                {
-                    // Diffuse reflection
-                    ray.origin = hit.position + hit.normal * 0.001f;
-                    ray.direction = SampleHemisphere(hit.normal, 1.0f);
-                    ray.energy *= (1.0f / diffChance) * hit.albedo;
-                }
-                else
-                {
-                    // Terminate ray
-                    ray.energy = 0.0f;
-                }
-                return hit.emission;
-            }
-            else
-            {
-                // Erase the ray's energy - the sky doesn't reflect anything
-                ray.energy = 0.0f;
-                
-                // Sample the skybox and write it
-                float theta = acos(ray.direction.y) / - PI;
-                float phi = atan2(ray.direction.x, -ray.direction.z) / - PI * 0.5f;
-                return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
+                screenDepth = hit.distance;
             }
         }
+        sceneColor += Shade(ray, hit) * ray.energy;
+        if(!any(ray.energy))break;
+    }
+    return sceneColor;
+}
+
+float3 FogColor(Ray ray, float screenDepth)
+{
+    float3 fogColor = float3(0, 0, 0);
+    float3 currentPos = ray.origin +
+    ray.direction * (screenDepth * rand());
+    
+    Ray r = CreateRay(currentPos, SampleGlobalsphere());
+    RayHit hit = Trace(r);
+    if(hit.hited)
+    {
+        fogColor += hit.emission * r.energy;
+    }
+    return fogColor ;
+}
+
+float2 RandDisk()
+{
+    return float2(rand(), rand());
+}
+
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id: SV_DispatchThreadID)
+{
+    _Pixel = id.xy;
+    // Get the dimensions of the RenderTexture
+    uint width = _ScreenSize.x;
+    uint height = _ScreenSize.y;
+    // Transform pixel to [-1,1] range
+    float2 uv = float2((id.xy + _PixelOffset * rand()) / float2(width, height) * 2.0f - 1.0f) ;
+    
+    float3 final = float3(0, 0, 0);
+    for (uint spp = 0; spp < _SamplePerPixel; spp ++)
+    {
+        //Random
+        _seed = _randomBuffer[spp];
         
-        float3 SceneColor(Ray ray, inout float screenDepth)
-        {
-            float3 sceneColor = float3(0, 0, 0);
-            for (uint i = 0; i < _bounces; i ++)
-            {
-                RayHit hit = Trace(ray);
-                if (hit.hited)
-                {
-                    if(i == 0)
-                    {
-                        screenDepth = hit.distance;
-                    }
-                }
-                sceneColor += Shade(ray, hit) * ray.energy;
-                if(!any(ray.energy))break;
-            }
-            return sceneColor;
-        }
-        
-        float3 FogColor(Ray ray, float screenDepth)
-        {
-            float3 fogColor = float3(0, 0, 0);
-            float3 currentPos = ray.origin +
-            ray.direction * (screenDepth * rand());
-            
-            Ray r = CreateRay(currentPos, SampleGlobalsphere());
-            RayHit hit = Trace(r);
-            if(hit.hited)
-            {
-                fogColor += hit.emission * r.energy;
-            }
-            return fogColor ;
-        }
-        
-        float2 RandDisk()
-        {
-            return float2(rand(), rand());
-        }
-        
-        [numthreads(8, 8, 1)]
-        void CSMain(uint3 id: SV_DispatchThreadID)
-        {
-            _Pixel = id.xy;
-            // Get the dimensions of the RenderTexture
-            uint width = _ScreenSize.x;
-            uint height = _ScreenSize.y;
-            // Transform pixel to [-1,1] range
-            float2 uv = float2((id.xy + _PixelOffset * rand()) / float2(width, height) * 2.0f - 1.0f) ;
-            
-            float3 final = float3(0, 0, 0);
-            for (uint spp = 0; spp < _SamplePerPixel; spp ++)
-            {
-                Ray ray = CreateCameraRay(uv);
-                //Dof
-                float3 foucePos = ray.origin + ray.direction * _focus;
-                ray.origin += cross(SampleGlobalsphere(), ray.direction) * _circleOfConfusion;
-                ray.direction = normalize(foucePos - ray.origin);
-                //
-                Ray sceneRay = ray;
-                Ray fogRay = ray;
-                float screenDepth = 0;
-                float3 sceneColor = SceneColor(sceneRay, screenDepth);
-                final += sceneColor;
-                //float3 fogColor = FogColor(fogRay, screenDepth);
-                //final += fogColor;
-                //final /= 2;
-                
-                //Random
-                _Seed = _randomBuffer[spp];
-            }
-            
-            //Apply gamma correction
-            //final = pow(final, 1 / 2.2);
-            //final = pow(final, 2.2);
-            
-            Result[id.xy] += float4(final, 1);
-            ResultOut[id.xy] = Result[id.xy] / _sampleCount;
-            ResultOut[id.xy] = pow(ResultOut[id.xy], 1 / 2.2);
-        }
-        
+        Ray ray = CreateCameraRay(uv);
+        //Dof
+        float3 foucePos = ray.origin + ray.direction * _focus;
+        ray.origin += cross(SampleGlobalsphere(), ray.direction) * _circleOfConfusion;
+        ray.direction = normalize(foucePos - ray.origin);
+        //
+        Ray sceneRay = ray;
+        Ray fogRay = ray;
+        float screenDepth = 0;
+        float3 sceneColor = SceneColor(sceneRay, screenDepth);
+        final += sceneColor;
+        //float3 fogColor = FogColor(fogRay, screenDepth);
+        //final += fogColor;
+        //final /= 2;
+    }
+    
+    //Apply gamma correction
+    //final = pow(final, 1 / 2.2);
+    //final = pow(final, 2.2);
+    
+    Result[id.xy] += float4(final, 1);
+    ResultOut[id.xy] = Result[id.xy] / _sampleCount;
+    ResultOut[id.xy] = pow(ResultOut[id.xy], 1 / 2.2);
+}
+
