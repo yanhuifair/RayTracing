@@ -477,7 +477,7 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  rayTracingMaterial: {fileID: 11400000, guid: 86a0b0cbf20034e848f2bbf564163394, type: 2}
+  rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
 --- !u!4 &63253586
 Transform:
@@ -1829,14 +1829,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 846049119}
-  m_LocalRotation: {x: -0.5087098, y: -0.49182394, z: -0.49712083, w: 0.5021897}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 39.42, y: 42.6, z: 40.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 899695713}
   m_Father: {fileID: 0}
   m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: -450.68, y: -443.461, z: -5.281006}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &899695712
 GameObject:
   m_ObjectHideFlags: 0
@@ -2339,6 +2339,36 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &1166049427
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1166049428}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1166049428
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1166049427}
+  m_LocalRotation: {x: -0.06735135, y: -0.90462786, z: -0.15755033, w: 0.3902437}
+  m_LocalPosition: {x: 38.002, y: 41.322, z: 40.01}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1194857100
 GameObject:
   m_ObjectHideFlags: 0
@@ -2517,7 +2547,7 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  rayTracingMaterial: {fileID: 11400000, guid: b14089833857d45a2bdf08f2d7b4d721, type: 2}
+  rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
 --- !u!4 &1198994190
 Transform:

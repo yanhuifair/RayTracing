@@ -16,4 +16,4 @@ MonoBehaviour:
   albedo: {r: 0, g: 0, b: 0, a: 1}
   specular: {r: 1, g: 1, b: 1, a: 1}
   smoothness: 0
-  emission: {r: 19.037523, g: 8.99955, b: 0, a: 1}
+  emission: {r: 4, g: 4, b: 4, a: 1}

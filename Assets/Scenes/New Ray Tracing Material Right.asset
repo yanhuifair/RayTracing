@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   texture2D: {fileID: 0}
   albedo: {r: 0.025950909, g: 0, b: 1, a: 1}
-  specular: {r: 0, g: 0, b: 0, a: 1}
+  specular: {r: 1, g: 0, b: 0, a: 1}
   smoothness: 0
   emission: {r: 0, g: 0, b: 0, a: 1}
