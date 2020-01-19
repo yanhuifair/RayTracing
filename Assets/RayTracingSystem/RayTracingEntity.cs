@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
-[ExecuteInEditMode]
+[AddComponentMenu("Ray Tracing/Ray Tracing Entity")]
 public class RayTracingEntity : MonoBehaviour
 {
     public enum EntityType
@@ -28,7 +28,7 @@ public class RayTracingEntity : MonoBehaviour
         attributeChanged = true;
     }
 
-    public bool AnyChanged()
+    public bool isAnyChanged()
     {
         return transform.hasChanged || attributeChanged;
     }
