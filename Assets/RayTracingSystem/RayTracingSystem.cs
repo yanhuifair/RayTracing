@@ -28,6 +28,11 @@ public class RayTracingSystem
             }
             return computeShader;
         }
+
+        set
+        {
+            computeShader = value;
+        }
     }
     int? kernalIndex = null;
     int KERNALINDEX
@@ -205,7 +210,9 @@ public class RayTracingSystem
         spheres.Clear();
         foreach (var item in RayTracingEntities)
         {
-            if (item.entityType == RayTracingEntity.EntityType.Sphere && item.gameObject.activeInHierarchy == true)
+            if (item.entityType == RayTracingEntity.EntityType.Sphere
+                && item.rayTracingMaterial != null
+                && item.gameObject.activeInHierarchy == true)
             {
                 spheres.Add(new SphereInfo()
                 {
@@ -250,7 +257,9 @@ public class RayTracingSystem
         boxs.Clear();
         foreach (var item in RayTracingEntities)
         {
-            if (item.entityType == RayTracingEntity.EntityType.Box && item.gameObject.activeInHierarchy == true)
+            if (item.entityType == RayTracingEntity.EntityType.Box
+                && item.rayTracingMaterial != null
+                && item.gameObject.activeInHierarchy == true)
             {
                 Matrix4x4 matrix4X4 = Matrix4x4.TRS(item.transform.position, item.transform.rotation, item.transform.lossyScale);
                 boxs.Add(new BoxInfo()
@@ -308,7 +317,10 @@ public class RayTracingSystem
 
         foreach (RayTracingEntity item in RayTracingEntities)
         {
-            if (item.entityType == RayTracingEntity.EntityType.Mesh && item.gameObject.activeInHierarchy == true)
+            if (item.entityType == RayTracingEntity.EntityType.Mesh
+                && item.mesh != null
+                && item.rayTracingMaterial != null
+                && item.gameObject.activeInHierarchy == true)
             {
                 MeshFilter meshFilter = item.gameObject.GetComponent<MeshFilter>();
                 if (meshFilter == null) continue;
@@ -330,7 +342,7 @@ public class RayTracingSystem
                 _meshObjects.Add(new MeshObject()
                 {
                     position = item.transform.position,
-                        boundsSize = ((Bounds) item.GetBounds()).size,
+                        boundsSize = item.bounds.size,
                         localToWorldMatrix = item.transform.localToWorldMatrix,
                         indices_offset = firstIndex,
                         indices_count = indices.Length,
@@ -495,7 +507,7 @@ public class RayTracingSystem
 
         //Material
         SetComputeBuffer("_materialBuffer", materialInfoBuffer);
-        RayTracingComputeShader.SetTexture(KERNALINDEX, "_materialTextures", materialTexture2DArray);
+        // RayTracingComputeShader.SetTexture(KERNALINDEX, "_materialTextures", materialTexture2DArray);
     }
 
     private void SetComputeBuffer(string name, ComputeBuffer buffer)
@@ -536,8 +548,8 @@ public class RayTracingSystem
     {
         RayTracingComputeShader.SetTexture(KERNALINDEX, "Result", GetRenderTextureAdd);
         RayTracingComputeShader.SetTexture(KERNALINDEX, "ResultOut", GetRenderTextureOut);
-        int threadGroupsX = Mathf.CeilToInt(GetRenderTextureAdd.width / 8);
-        int threadGroupsY = Mathf.CeilToInt(GetRenderTextureAdd.height / 8);
+        int threadGroupsX = Mathf.CeilToInt(GetRenderTextureAdd.width / 16);
+        int threadGroupsY = Mathf.CeilToInt(GetRenderTextureAdd.height / 16);
         RayTracingComputeShader.Dispatch(KERNALINDEX, threadGroupsX, threadGroupsY, 1);
     }
 }

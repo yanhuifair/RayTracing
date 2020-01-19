@@ -3,25 +3,24 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
-[AddComponentMenu("Ray Tracing/Ray Tracing Entity")]
+[ExecuteAlways, AddComponentMenu("Ray Tracing/Ray Tracing Entity")]
 public class RayTracingEntity : MonoBehaviour
 {
     public enum EntityType
     {
-        Mesh,
-        Fog,
-        Sphere,
-        Box
+        Mesh = 0,
+        Sphere = 1,
+        Box = 2,
+        Fog = 3,
     }
 
-    [OnValueChanged("AttributeChanged")][EnumToggleButtons] public EntityType entityType = EntityType.Sphere;
-    [OnValueChanged("AttributeChanged")][ShowIf("entityType", EntityType.Sphere)] public float radius = 1;
-    [OnValueChanged("AttributeChanged")][ShowIf("entityType", EntityType.Box)] public Vector3 boxSize = Vector3.one;
+    public EntityType entityType = EntityType.Sphere;
+    public float radius = 1;
+    public Vector3 boxSize = Vector3.one;
+    public Mesh mesh;
 
-    [OnValueChanged("AttributeChanged")] public RayTracingMaterial rayTracingMaterial;
-
-    //
-    [ReadOnly][SerializeField] bool attributeChanged = false;
+    public RayTracingMaterial rayTracingMaterial;
+    public bool attributeChanged = false;
 
     public void AttributeChanged()
     {
@@ -39,17 +38,26 @@ public class RayTracingEntity : MonoBehaviour
         attributeChanged = false;
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
-        if (entityType == EntityType.Mesh && GetBounds() != null)
+        if (entityType == EntityType.Mesh && mesh != null)
         {
-            Gizmos.DrawWireCube(((Bounds) GetBounds()).center, ((Bounds) GetBounds()).size);
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(bounds.center, bounds.size);
+
+            Gizmos.color = Color.gray;
+            var matrix = Gizmos.matrix;
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawWireMesh(mesh, Vector3.zero, Quaternion.identity);
+            Gizmos.matrix = matrix;
         }
     }
 
-    public Bounds? GetBounds()
+    public Bounds bounds
     {
-        var bounds = transform.GetComponent<MeshRenderer>()?.bounds;
-        return bounds;
+        get
+        {
+            return GeometryUtility.CalculateBounds(mesh.vertices, transform.localToWorldMatrix);
+        }
     }
 }

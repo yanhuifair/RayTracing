@@ -157,8 +157,13 @@ MonoBehaviour:
   entityType: 0
   radius: 2
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  needCalculateBounds: 0
 --- !u!65 &16092864
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -227,7 +232,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 16092862}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38.741, y: 41.472, z: 39.879}
+  m_LocalPosition: {x: 38.741, y: 41.472, z: 39.77}
   m_LocalScale: {x: 4.8817253, y: 0.29916927, z: 0.27868912}
   m_Children: []
   m_Father: {fileID: 0}
@@ -477,8 +482,13 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
+  mesh: {fileID: 0}
+  rayTracingMaterial: {fileID: 0}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  needCalculateBounds: 0
 --- !u!4 &63253586
 Transform:
   m_ObjectHideFlags: 0
@@ -528,8 +538,13 @@ MonoBehaviour:
   entityType: 0
   radius: 2
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  needCalculateBounds: 0
 --- !u!65 &165306965
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -598,7 +613,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 165306963}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38.741, y: 41.472, z: 37.582}
+  m_LocalPosition: {x: 38.741, y: 41.472, z: 37.224}
   m_LocalScale: {x: 4.8817253, y: 0.29916927, z: 0.27868912}
   m_Children: []
   m_Father: {fileID: 0}
@@ -639,8 +654,13 @@ MonoBehaviour:
   entityType: 0
   radius: 2
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  needCalculateBounds: 0
 --- !u!65 &211209412
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1382,8 +1402,13 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  needCalculateBounds: 0
 --- !u!4 &662167337
 Transform:
   m_ObjectHideFlags: 0
@@ -1759,8 +1784,13 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 0}
   rayTracingMaterial: {fileID: 11400000, guid: a199c8a1d8a264e369c634008e5bafca, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  needCalculateBounds: 0
 --- !u!64 &846049121
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1830,7 +1860,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 846049119}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 39.42, y: 42.6, z: 40.03}
+  m_LocalPosition: {x: 39.42, y: 42.6, z: 39.59}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 899695713}
@@ -2450,8 +2480,13 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  needCalculateBounds: 0
 --- !u!4 &1194857104
 Transform:
   m_ObjectHideFlags: 0
@@ -2547,8 +2582,13 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  needCalculateBounds: 0
 --- !u!4 &1198994190
 Transform:
   m_ObjectHideFlags: 0
@@ -2762,8 +2802,13 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 0}
   rayTracingMaterial: {fileID: 0}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  needCalculateBounds: 0
 --- !u!64 &1361144822
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2935,8 +2980,13 @@ MonoBehaviour:
   entityType: 0
   radius: 2
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  needCalculateBounds: 0
 --- !u!65 &1383237935
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3005,7 +3055,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1383237933}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38.741, y: 41.472, z: 38.54}
+  m_LocalPosition: {x: 38.741, y: 41.472, z: 38.153}
   m_LocalScale: {x: 4.8817253, y: 0.29916927, z: 0.27868912}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3092,8 +3142,13 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  needCalculateBounds: 0
 --- !u!4 &1409647580
 Transform:
   m_ObjectHideFlags: 0
@@ -3306,8 +3361,13 @@ MonoBehaviour:
   entityType: 0
   radius: 2
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  needCalculateBounds: 0
 --- !u!65 &1533504098
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3376,7 +3436,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533504096}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38.741, y: 41.472, z: 39.269}
+  m_LocalPosition: {x: 38.741, y: 41.472, z: 38.991}
   m_LocalScale: {x: 4.8817253, y: 0.29916927, z: 0.27868912}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3580,8 +3640,13 @@ MonoBehaviour:
   entityType: 0
   radius: 2
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  needCalculateBounds: 0
 --- !u!65 &1731037629
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3691,8 +3756,13 @@ MonoBehaviour:
   entityType: 0
   radius: 2
   boxSize: {x: 1, y: 1, z: 1}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
+  bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  needCalculateBounds: 0
 --- !u!65 &1877281828
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3761,7 +3831,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1877281826}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38.741, y: 41.472, z: 42.059}
+  m_LocalPosition: {x: 38.741, y: 41.472, z: 42.276}
   m_LocalScale: {x: 4.8817253, y: 0.29916927, z: 0.27868912}
   m_Children: []
   m_Father: {fileID: 0}

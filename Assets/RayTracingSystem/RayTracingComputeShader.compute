@@ -484,7 +484,7 @@ float2 RandDisk()
     return float2(rand(), rand());
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(16, 16, 1)]
 void CSMain(uint3 id: SV_DispatchThreadID)
 {
     _Pixel = id.xy;
@@ -511,9 +511,9 @@ void CSMain(uint3 id: SV_DispatchThreadID)
         float screenDepth = 0;
         float3 sceneColor = SceneColor(sceneRay, screenDepth);
         final += sceneColor;
-        float3 fogColor = FogColor(fogRay, screenDepth);
-        final += fogColor * 10 ;
-        final /= 5;
+        //float3 fogColor = FogColor(fogRay, screenDepth);
+        //final += fogColor * 10 ;
+        //final /= 5;
     }
     
     //Apply gamma correction

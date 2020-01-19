@@ -123,8 +123,9 @@ public class RayTracingWindow : EditorWindow
         if (rayTracingSystem.focusObject != null && rayTracingSystem.camera != null)
         {
             EditorGUI.BeginDisabledGroup(true);
+            rayTracingSystem.focus = Vector3.Distance(rayTracingSystem.focusObject.transform.position, rayTracingSystem.camera.transform.position);
             EditorGUILayout.FloatField("Focus",
-                Vector3.Distance(rayTracingSystem.focusObject.transform.position, rayTracingSystem.camera.transform.position));
+                rayTracingSystem.focus);
             EditorGUI.EndDisabledGroup();
         }
         else
@@ -140,7 +141,7 @@ public class RayTracingWindow : EditorWindow
 
         //Sample
         GUILayout.BeginHorizontal();
-        samplePerPixel = EditorGUILayout.IntSlider("Sample Per Pixel", samplePerPixel, 1, 1000);
+        samplePerPixel = EditorGUILayout.IntSlider("Sample Per Pixel", samplePerPixel, 1, 100000);
         rayTracingSystem.bounces = EditorGUILayout.IntSlider("Bounces", rayTracingSystem.bounces, 1, 10);
         GUILayout.EndHorizontal();
 
@@ -218,8 +219,6 @@ public class RayTracingWindow : EditorWindow
                 quaternionLast = rayTracingSystem.camera.transform.rotation;
                 rayTracingSystem.needReset = true;
 
-                // rayTracingSystem.samplePerPixel = 1;
-                // renderTexture = rayTracingSystem.Render();
                 WINDOW.Repaint();
             }
         }
@@ -231,7 +230,6 @@ public class RayTracingWindow : EditorWindow
         {
             renderTexture = rayTracingSystem.Render();
             WINDOW.Repaint();
-            //UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
         }
     }
 }

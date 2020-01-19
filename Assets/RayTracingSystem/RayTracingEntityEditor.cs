@@ -6,31 +6,57 @@ using UnityEngine;
 [CustomEditor(typeof(RayTracingEntity))]
 public class RayTracingEntityEditor : Editor
 {
-    SerializedProperty entityType;
-    SerializedProperty radius;
-    SerializedProperty boxSize;
-    SerializedProperty rayTracingMaterial;
-    SerializedProperty attributeChanged;
-
-    void OnEnable()
-    {
-        entityType = serializedObject.FindProperty("entityType");
-        radius = serializedObject.FindProperty("radius");
-        boxSize = serializedObject.FindProperty("boxSize");
-        rayTracingMaterial = serializedObject.FindProperty("rayTracingMaterial");
-        attributeChanged = serializedObject.FindProperty("attributeChanged");
-    }
-
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        EditorGUILayout.PropertyField(entityType);
-        EditorGUILayout.PropertyField(radius);
-        EditorGUILayout.PropertyField(boxSize);
-        EditorGUILayout.PropertyField(rayTracingMaterial);
-        // if (rayTracingMaterial.)
+        var rayTracingEntity = target as RayTracingEntity;
+        EditorGUI.BeginChangeCheck();
+        rayTracingEntity.entityType = GUILayout.Toolbar(rayTracingEntity.entityType.ToInt(), EnumExtension.ToStringArray<RayTracingEntity.EntityType>()).ToEnum<RayTracingEntity.EntityType>();
 
-        EditorGUILayout.PropertyField(attributeChanged);
+        switch (rayTracingEntity.entityType)
+        {
+            case RayTracingEntity.EntityType.Mesh:
+                {
+                    rayTracingEntity.mesh = EditorGUILayout.ObjectField("Mesh", rayTracingEntity.mesh, typeof(Mesh), false) as Mesh;
+                }
+                break;
+            case RayTracingEntity.EntityType.Sphere:
+                {
+                    rayTracingEntity.radius = EditorGUILayout.FloatField("Radius", rayTracingEntity.radius);
+                }
+                break;
+            case RayTracingEntity.EntityType.Box:
+                {
+                    rayTracingEntity.boxSize = EditorGUILayout.Vector3Field("Box Size", rayTracingEntity.boxSize);
+                }
+                break;
+            case RayTracingEntity.EntityType.Fog:
+                {
+
+                }
+                break;
+        }
+
+        EditorGUILayout.Space();
+        rayTracingEntity.rayTracingMaterial = EditorGUILayout.ObjectField("Material", rayTracingEntity.rayTracingMaterial, typeof(RayTracingMaterial), true) as RayTracingMaterial;
+        if (rayTracingEntity.rayTracingMaterial != null)
+        {
+            EditorGUILayout.BeginVertical("helpbox");
+            rayTracingEntity.rayTracingMaterial.albedo = EditorGUILayout.ColorField("Albedo", rayTracingEntity.rayTracingMaterial.albedo);
+            rayTracingEntity.rayTracingMaterial.specular = EditorGUILayout.ColorField("Specular", rayTracingEntity.rayTracingMaterial.specular);
+            rayTracingEntity.rayTracingMaterial.emission = EditorGUILayout.ColorField("Emission", rayTracingEntity.rayTracingMaterial.emission);
+            rayTracingEntity.rayTracingMaterial.smoothness = EditorGUILayout.Slider("Smoothness", rayTracingEntity.rayTracingMaterial.smoothness, 0, 1);
+            EditorGUILayout.EndVertical();
+        }
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(target, "Entity Changed");
+            rayTracingEntity.attributeChanged = true;
+        }
+
+        EditorGUI.BeginDisabledGroup(true);
+        EditorGUILayout.Toggle("Changed", rayTracingEntity.attributeChanged);
+        EditorGUI.EndDisabledGroup();
 
         serializedObject.ApplyModifiedProperties();
     }
