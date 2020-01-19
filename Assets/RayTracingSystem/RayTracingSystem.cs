@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class RayTracingSystem
 {
@@ -131,7 +132,7 @@ public class RayTracingSystem
     public RayTracingEntity[] RayTracingEntities;
 
     //Entity
-    [MenuItem("GameObject/Ray Tracing/Entity")]
+    [MenuItem("GameObject/Ray Tracing/Entity", false)]
     static void CreateNewEntity(MenuCommand menuCommand)
     {
         var obj = new GameObject();
@@ -387,6 +388,7 @@ public class RayTracingSystem
     public struct MaterialInfo
     {
         //public Texture2D texture2D;
+        public int textureIndex;
         public Vector3 albedo;
         public Vector3 specular;
         public float smoothness;
@@ -397,10 +399,35 @@ public class RayTracingSystem
     List<MaterialInfo> materialInfos = new List<MaterialInfo>();
     List<RayTracingMaterial> raytracingMaterials = new List<RayTracingMaterial>();
 
+    Texture2DArray materialTexture2DArray;
+
     void SetupMaterials()
     {
         raytracingMaterials.Clear();
         materialInfos.Clear();
+
+        // if (materialTexture2DArray != null)
+        // {
+        //     for (int i = 0; i < materialTexture2DArray.depth; i++)
+        //     {
+        //         if (materialTexture2DArray[i] != null)materialTexture2DArray.get
+        //         {
+
+        //         }
+        //         }
+        //         foreach (var item in materialTexture2DArray.depth)
+        //         {
+
+        //         }
+        //         }
+        //         materialTexture2DArray = new RenderTexture(512, 512, 0, RenderTextureFormat.ARGB32)
+        //         {
+        //         dimension = TextureDimension.Tex2DArray,
+        //         enableRandomWrite = true,
+        //         volumeDepth = 3,
+        // };
+        // materialTexture2DArray.Create();
+
         foreach (var item in RayTracingEntities)
         {
             if (item.rayTracingMaterial == null) continue;
@@ -430,7 +457,7 @@ public class RayTracingSystem
     void SetShaderParameters()
     {
         //Camera
-        RayTracingComputeShader.SetFloat("_CameraFar", camera.farClipPlane);
+        RayTracingComputeShader.SetFloat("_farClipPlane", camera.farClipPlane);
         RayTracingComputeShader.SetFloat("_focus", focusObject?Vector3.Distance(focusObject.transform.position, camera.transform.position) : focus);
         RayTracingComputeShader.SetFloat("_circleOfConfusion", circleOfConfusion);
         RayTracingComputeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
@@ -468,6 +495,7 @@ public class RayTracingSystem
 
         //Material
         SetComputeBuffer("_materialBuffer", materialInfoBuffer);
+        RayTracingComputeShader.SetTexture(KERNALINDEX, "_materialTextures", materialTexture2DArray);
     }
 
     private void SetComputeBuffer(string name, ComputeBuffer buffer)
@@ -483,7 +511,7 @@ public class RayTracingSystem
         RayTracingEntities = GameObject.FindObjectsOfType<RayTracingEntity>();
         foreach (var item in RayTracingEntities)
         {
-            if (item.AnyChanged())
+            if (item.isAnyChanged())
             {
                 needReset = true;
                 item.ResetChanged();

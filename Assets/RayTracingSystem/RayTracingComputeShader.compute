@@ -13,13 +13,14 @@ SamplerState sampler_SkyboxTexture;
 
 static const float PI = 3.14159265f;
 static const float EPSILON = 1e-8;
+static const float GAMMA = 0.454545f;
 
 float2 _PixelOffset;
 
 float3 _ScreenSize;
 uint _bounces;
 uint _SamplePerPixel;
-float _CameraFar;
+float _farClipPlane;
 uint _sampleCount;
 
 //DOF
@@ -68,13 +69,14 @@ StructuredBuffer<int> _Indices;
 
 struct MaterialInfo
 {
-    //Texture2D texture2D;
+    int textureIndex;
     float3 albedo;
     float3 specular;
     float smoothness;
     float3 emission;
 };
 StructuredBuffer<MaterialInfo> _materialBuffer;
+Texture2DArray<float4> _materialTextures;
 
 struct Ray
 {
@@ -113,7 +115,7 @@ RayHit CreateRayHit()
 {
     RayHit hit;
     hit.position = float3(0, 0, 0);
-    // hit.distance = _CameraFar;
+    // hit.distance = _farClipPlane;
     hit.distance = 1.#INF;
     hit.normal = float3(0, 0, 0);
     hit.albedo = float3(0.1, 0.1, 0.1);
@@ -171,7 +173,7 @@ void IntersectSphere(Ray ray, inout RayHit hit, Sphere sphere)
         return;
     float p2 = sqrt(p2sqr);
     float t = p1 - p2 > 0 ? p1 - p2: p1 + p2;
-    if(t > 0 && t < hit.distance)
+    if(t > 0 && t < _farClipPlane && t < hit.distance)
     {
         MaterialInfo materialInfo = _materialBuffer[sphere.materialIndex];
         
@@ -206,7 +208,7 @@ void IntersectionBox(Ray ray, inout RayHit hit, Box box)
     }
     else//Hited
     {
-        if (t > 0 && t < _CameraFar && t < hit.distance)
+        if (t > 0 && t < _farClipPlane && t < hit.distance)
         {
             MaterialInfo materialInfo = _materialBuffer[box.materialIndex];
             
@@ -250,7 +252,8 @@ bool IntersectMeshObjectBounds(Ray ray, inout RayHit hit, MeshObject meshObject)
     return IntersectionBounds(ray, hit, meshObject.position, meshObject.boundsSize / 2);
 }
 
-bool IntersectTriangle(Ray ray, float3 vert0, float3 vert1, float3 vert2,
+bool IntersectTriangle(Ray ray,
+float3 vert0, float3 vert1, float3 vert2,
 inout float t, inout float u, inout float v)
 {
     // find vectors for two edges sharing vert0
@@ -304,7 +307,7 @@ void IntersectMeshObject(Ray ray, inout RayHit hit, MeshObject meshObject)
         float t, u, v;
         if (IntersectTriangle(ray, v0, v1, v2, t, u, v))
         {
-            if(t > 0 && t < _CameraFar && t < hit.distance)
+            if(t > 0 && t < _farClipPlane && t < hit.distance)
             {
                 MaterialInfo materialInfo = _materialBuffer[meshObject.materialIndex];
                 
@@ -519,6 +522,6 @@ void CSMain(uint3 id: SV_DispatchThreadID)
     
     Result[id.xy] += float4(final, 1);
     ResultOut[id.xy] = Result[id.xy] / _sampleCount;
-    ResultOut[id.xy] = pow(ResultOut[id.xy], 1 / 2.2);
+    ResultOut[id.xy] = pow(max(0, ResultOut[id.xy]), GAMMA);
 }
 

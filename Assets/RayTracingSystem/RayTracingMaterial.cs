@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Ray Tracing/Material")]
+[CreateAssetMenu(menuName = "Ray Tracing/Material", order = 306)]
 public class RayTracingMaterial : ScriptableObject
 {
     public Texture2D texture2D;

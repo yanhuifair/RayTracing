@@ -4,9 +4,12 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - RayTracingShader: {fileID: 7200000, guid: 3433e7b6752fc4b57a6d2e4b5210feec, type: 3}
-  - _SkyboxTexture: {instanceID: 0}
-  - DirectionalLight: {instanceID: 0}
+  - RayTracingComputeShader: {fileID: 7200000, guid: 3433e7b6752fc4b57a6d2e4b5210feec,
+      type: 3}
+  - addSahder: {fileID: 4800000, guid: 1d97b2ae7d3b04e6e9680614a2ee8bac, type: 3}
+  - skyBoxTexture: {instanceID: 0}
+  - renderTexture: {instanceID: 0}
+  - renderTextureCover: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -7,9 +7,6 @@ int stateMax;
 struct Cell
 {
     int state;
-    float x;
-    float y;
-    float z;
 };
 RWStructuredBuffer<Cell> cell;
 RWStructuredBuffer<Cell> cellOut;
