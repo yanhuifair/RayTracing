@@ -66,7 +66,11 @@ public class RayTracingWindow : EditorWindow
             if (cameras.Contains(camera)) continue;
 
             cameras.Add(camera);
-            if (rayTracingSystem.camera == null) rayTracingSystem.camera = camera;
+            if (rayTracingSystem.camera == null)
+            {
+                rayTracingSystem.camera = camera;
+                rayTracingSystem.needReset = true;
+            }
         }
     }
 
@@ -76,7 +80,7 @@ public class RayTracingWindow : EditorWindow
         float singleLineHeight = EditorGUIUtility.singleLineHeight;
 
         GUILayout.BeginHorizontal();
-        //rayTracingSystem.computeShader = EditorGUILayout.ObjectField("Compute Shader", rayTracingSystem.computeShader, typeof(ComputeShader), false) as ComputeShader;
+        rayTracingSystem.RayTracingComputeShader = EditorGUILayout.ObjectField("Compute Shader", rayTracingSystem.RayTracingComputeShader, typeof(ComputeShader), false) as ComputeShader;
         rayTracingSystem.skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", rayTracingSystem.skyBoxTexture, typeof(UnityEngine.Object), false) as Texture2D;
         GUILayout.EndHorizontal();
 
@@ -216,7 +220,7 @@ public class RayTracingWindow : EditorWindow
 
                 // rayTracingSystem.samplePerPixel = 1;
                 // renderTexture = rayTracingSystem.Render();
-                // WINDOW.Repaint();
+                WINDOW.Repaint();
             }
         }
     }

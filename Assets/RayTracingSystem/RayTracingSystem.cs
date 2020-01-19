@@ -27,6 +27,10 @@ public class RayTracingSystem
             }
             return computeShader;
         }
+        set
+        {
+            computeShader = value;
+        }
     }
     int? kernalIndex = null;
     int KERNALINDEX
@@ -468,6 +472,7 @@ public class RayTracingSystem
 
         //Material
         SetComputeBuffer("_materialBuffer", materialInfoBuffer);
+        // RayTracingComputeShader.set
     }
 
     private void SetComputeBuffer(string name, ComputeBuffer buffer)

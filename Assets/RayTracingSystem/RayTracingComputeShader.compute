@@ -508,9 +508,9 @@ void CSMain(uint3 id: SV_DispatchThreadID)
         float screenDepth = 0;
         float3 sceneColor = SceneColor(sceneRay, screenDepth);
         final += sceneColor;
-        //float3 fogColor = FogColor(fogRay, screenDepth);
-        //final += fogColor;
-        //final /= 2;
+        float3 fogColor = FogColor(fogRay, screenDepth);
+        final += fogColor * 10 ;
+        final /= 5;
     }
     
     //Apply gamma correction

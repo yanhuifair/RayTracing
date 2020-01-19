@@ -20,6 +20,7 @@ public class RayTracingEntity : MonoBehaviour
 
     [OnValueChanged("AttributeChanged")] public RayTracingMaterial rayTracingMaterial;
 
+    //
     [ReadOnly][SerializeField] bool attributeChanged = false;
 
     public void AttributeChanged()
@@ -49,8 +50,6 @@ public class RayTracingEntity : MonoBehaviour
     public Bounds? GetBounds()
     {
         var bounds = transform.GetComponent<MeshRenderer>()?.bounds;
-        //bounds = transform.GetComponent<MeshFilter>()?.mesh?.bounds;
         return bounds;
     }
-
 }
