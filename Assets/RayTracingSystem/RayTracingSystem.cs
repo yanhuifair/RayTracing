@@ -57,6 +57,7 @@ public class RayTracingSystem
             if (skyBoxTexture == null)
             {
                 skyBoxTexture = new Texture2D(2, 2);
+                skyBoxTexture.Apply();
             }
             return skyBoxTexture;
         }
@@ -322,20 +323,14 @@ public class RayTracingSystem
                 && item.rayTracingMaterial != null
                 && item.gameObject.activeInHierarchy == true)
             {
-                MeshFilter meshFilter = item.gameObject.GetComponent<MeshFilter>();
-                if (meshFilter == null) continue;
-
-                Mesh mesh = meshFilter.sharedMesh;
-                if (mesh == null) continue;
-
                 // Add vertex data
                 int firstVertex = _vertices.Count;
-                _vertices.AddRange(mesh.vertices);
+                _vertices.AddRange(item.mesh.vertices);
 
                 // Add index data - if the vertex buffer wasn't empty before, the
                 // indices need to be offset
                 int firstIndex = _indices.Count;
-                var indices = mesh.GetIndices(0);
+                var indices = item.mesh.GetIndices(0);
                 _indices.AddRange(indices.Select(index => index + firstVertex));
 
                 // Add the object itself
@@ -350,6 +345,7 @@ public class RayTracingSystem
                 });
             }
         }
+
         unsafe
         {
             CreateComputeBuffer(ref meshObjectBuffer, _meshObjects, sizeof(MeshObject));
@@ -375,11 +371,11 @@ public class RayTracingSystem
         {
             // If the buffer has been released or wasn't there to
             // begin with, create it
-            if (buffer == null)
+            if (buffer != null)
             {
-                buffer = new ComputeBuffer(data.Count, stride);
+                buffer.Release();
             }
-
+            buffer = new ComputeBuffer(data.Count, stride);
             // Set data on the buffer
             buffer.SetData(data);
         }
@@ -482,11 +478,13 @@ public class RayTracingSystem
         RayTracingComputeShader.SetVector("_ScreenSize", new Vector2(GetRenderTextureAdd.width, GetRenderTextureAdd.height));
 
         RayTracingComputeShader.SetInt("_bounces", bounces);
-        RayTracingComputeShader.SetInt("_SamplePerPixel", samplePerPixel);
+        RayTracingComputeShader.SetInt("_samplePerPixel", samplePerPixel);
 
         SetupRandom(samplePerPixel);
         SetComputeBuffer("_randomBuffer", randomBuffer);
         RayTracingComputeShader.SetFloat("_seed", UnityEngine.Random.value);
+        RayTracingComputeShader.SetInt("_dimension", 0);
+        RayTracingComputeShader.SetInt("_randomIndex", 0);
 
         sampleCount += samplePerPixel;
         RayTracingComputeShader.SetInt("_sampleCount", sampleCount);
@@ -548,8 +546,8 @@ public class RayTracingSystem
     {
         RayTracingComputeShader.SetTexture(KERNALINDEX, "Result", GetRenderTextureAdd);
         RayTracingComputeShader.SetTexture(KERNALINDEX, "ResultOut", GetRenderTextureOut);
-        int threadGroupsX = Mathf.CeilToInt(GetRenderTextureAdd.width / 16);
-        int threadGroupsY = Mathf.CeilToInt(GetRenderTextureAdd.height / 16);
+        int threadGroupsX = Mathf.CeilToInt(GetRenderTextureAdd.width / 8);
+        int threadGroupsY = Mathf.CeilToInt(GetRenderTextureAdd.height / 8);
         RayTracingComputeShader.Dispatch(KERNALINDEX, threadGroupsX, threadGroupsY, 1);
     }
 }

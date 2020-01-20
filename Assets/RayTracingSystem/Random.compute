@@ -1,0 +1,70 @@
+﻿double IntegerRadicalInverse(int Base, int i)
+{
+    int numPoints, inverse;
+    numPoints = 1;
+    // 此循环将i在"Base"进制下的数字左右Flip
+    for (inverse = 0; i > 0; i /= Base)
+    {
+        inverse = inverse * Base + (i % Base);
+        numPoints = numPoints * Base;
+    }
+    
+    // 除以Digit将这个数镜像到小数点右边
+    return inverse / (double) numPoints;
+}
+
+double RadicalInverse(int Base, int i)
+{
+    double Digit, Radical, Inverse;
+    Digit = Radical = 1.0 / (double) Base;
+    Inverse = 0.0;
+    while(i)
+    {
+        // i余Base求出i在"Base"进制下的最低位的数
+        // 乘以Digit将这个数镜像到小数点右边
+        Inverse += Digit * (double) (i % Base);
+        Digit *= Radical;
+        
+        // i除以Base即可求右一位的数
+        i /= Base;
+    }
+    return Inverse;
+}
+
+
+int NthPrimeNumber(int i)
+{
+    int primenumber = i;
+    int num;
+    int count;
+    int x;
+    num = 3;
+    for (count = 2; count <= primenumber; )
+    {
+        for (x = 2; x <= num - 1; x ++)
+        {
+            if (num % x == 0)
+                break;
+        }
+        if(x == num)
+        {
+            count ++ ;
+        }
+        num ++ ;
+    }
+    return 0;
+}
+
+double Halton(int Dimension, int Index)
+{
+    // 直接用第Dimension个质数作为底数调用RadicalInverse即可
+    return RadicalInverse(NthPrimeNumber(Dimension), Index);
+}
+double Hammersley(int Dimension, int Index, int NumSamples)
+{
+    // Hammersley需要事先确定样本的总数
+    if (Dimension == 0)
+        return Index / (double) NumSamples;
+    else
+    return RadicalInverse(NthPrimeNumber(Dimension - 1), Index);
+}

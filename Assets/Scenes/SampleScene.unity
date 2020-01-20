@@ -160,10 +160,6 @@ MonoBehaviour:
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-  needCalculateBounds: 0
 --- !u!65 &16092864
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -482,13 +478,9 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  mesh: {fileID: 0}
+  mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 0}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  needCalculateBounds: 0
 --- !u!4 &63253586
 Transform:
   m_ObjectHideFlags: 0
@@ -541,10 +533,6 @@ MonoBehaviour:
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-  needCalculateBounds: 0
 --- !u!65 &165306965
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -657,10 +645,6 @@ MonoBehaviour:
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-  needCalculateBounds: 0
 --- !u!65 &211209412
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1402,13 +1386,9 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  mesh: {fileID: 0}
+  mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  needCalculateBounds: 0
 --- !u!4 &662167337
 Transform:
   m_ObjectHideFlags: 0
@@ -1784,13 +1764,9 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  mesh: {fileID: 0}
+  mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: a199c8a1d8a264e369c634008e5bafca, type: 2}
-  attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  needCalculateBounds: 0
+  attributeChanged: 1
 --- !u!64 &846049121
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2480,13 +2456,9 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  mesh: {fileID: 0}
+  mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  needCalculateBounds: 0
 --- !u!4 &1194857104
 Transform:
   m_ObjectHideFlags: 0
@@ -2582,13 +2554,9 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  mesh: {fileID: 0}
+  mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  needCalculateBounds: 0
 --- !u!4 &1198994190
 Transform:
   m_ObjectHideFlags: 0
@@ -2805,10 +2773,6 @@ MonoBehaviour:
   mesh: {fileID: 0}
   rayTracingMaterial: {fileID: 0}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  needCalculateBounds: 0
 --- !u!64 &1361144822
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2983,10 +2947,6 @@ MonoBehaviour:
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-  needCalculateBounds: 0
 --- !u!65 &1383237935
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3145,10 +3105,6 @@ MonoBehaviour:
   mesh: {fileID: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  needCalculateBounds: 0
 --- !u!4 &1409647580
 Transform:
   m_ObjectHideFlags: 0
@@ -3364,10 +3320,6 @@ MonoBehaviour:
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-  needCalculateBounds: 0
 --- !u!65 &1533504098
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3643,10 +3595,6 @@ MonoBehaviour:
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-  needCalculateBounds: 0
 --- !u!65 &1731037629
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3759,10 +3707,6 @@ MonoBehaviour:
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
   attributeChanged: 0
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-  needCalculateBounds: 0
 --- !u!65 &1877281828
 BoxCollider:
   m_ObjectHideFlags: 0

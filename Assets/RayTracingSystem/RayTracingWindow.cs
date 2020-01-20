@@ -142,7 +142,7 @@ public class RayTracingWindow : EditorWindow
         //Sample
         GUILayout.BeginHorizontal();
         samplePerPixel = EditorGUILayout.IntSlider("Sample Per Pixel", samplePerPixel, 1, 100000);
-        rayTracingSystem.bounces = EditorGUILayout.IntSlider("Bounces", rayTracingSystem.bounces, 1, 10);
+        rayTracingSystem.bounces = EditorGUILayout.IntSlider("Bounces", rayTracingSystem.bounces, 0, 4);
         GUILayout.EndHorizontal();
 
         //Button
@@ -150,11 +150,14 @@ public class RayTracingWindow : EditorWindow
         EditorGUILayout.LabelField("Sample Count: " + rayTracingSystem.sampleCount.ToString(), GUILayout.Width(position.width / 4 - spacing * 2));
         if (GUILayout.Button("Reset", GUILayout.Width(position.width / 4 - spacing * 2)))
         {
+            rayTracingSystem.ResetRenderTexture();
             rayTracingSystem.needReset = true;
+            WINDOW.Repaint();
         }
         if (GUILayout.Button($"Interation ({samplePerPixel})", GUILayout.Width(position.width / 4 - spacing * 2)))
         {
             rayTracingSystem.samplePerPixel = samplePerPixel;
+            rayTracingSystem.needReset = true;
             Interation();
         }
         if (GUILayout.RepeatButton("Interation Repeat"))

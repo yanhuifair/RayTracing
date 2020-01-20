@@ -41,10 +41,10 @@ public class RayTracingEntityEditor : Editor
         rayTracingEntity.rayTracingMaterial = EditorGUILayout.ObjectField("Material", rayTracingEntity.rayTracingMaterial, typeof(RayTracingMaterial), true) as RayTracingMaterial;
         if (rayTracingEntity.rayTracingMaterial != null)
         {
-            EditorGUILayout.BeginVertical("helpbox");
-            rayTracingEntity.rayTracingMaterial.albedo = EditorGUILayout.ColorField("Albedo", rayTracingEntity.rayTracingMaterial.albedo);
-            rayTracingEntity.rayTracingMaterial.specular = EditorGUILayout.ColorField("Specular", rayTracingEntity.rayTracingMaterial.specular);
-            rayTracingEntity.rayTracingMaterial.emission = EditorGUILayout.ColorField("Emission", rayTracingEntity.rayTracingMaterial.emission);
+            EditorGUILayout.BeginVertical("box");
+            rayTracingEntity.rayTracingMaterial.albedo = EditorGUILayout.ColorField(new GUIContent("Albedo"), rayTracingEntity.rayTracingMaterial.albedo, true, false, false);
+            rayTracingEntity.rayTracingMaterial.specular = EditorGUILayout.ColorField(new GUIContent("Specular"), rayTracingEntity.rayTracingMaterial.specular, true, false, false);
+            rayTracingEntity.rayTracingMaterial.emission = EditorGUILayout.ColorField(new GUIContent("Emission"), rayTracingEntity.rayTracingMaterial.emission, true, false, true);
             rayTracingEntity.rayTracingMaterial.smoothness = EditorGUILayout.Slider("Smoothness", rayTracingEntity.rayTracingMaterial.smoothness, 0, 1);
             EditorGUILayout.EndVertical();
         }
@@ -55,7 +55,7 @@ public class RayTracingEntityEditor : Editor
         }
 
         EditorGUI.BeginDisabledGroup(true);
-        EditorGUILayout.Toggle("Changed", rayTracingEntity.attributeChanged);
+        EditorGUILayout.LabelField(rayTracingEntity.attributeChanged? "Changed*": "");
         EditorGUI.EndDisabledGroup();
 
         serializedObject.ApplyModifiedProperties();
