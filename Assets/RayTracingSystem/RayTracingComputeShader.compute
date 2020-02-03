@@ -105,25 +105,9 @@ struct RayHit
 
 uint _dimension;
 uint _randomIndex;
-float RadicalInverse(uint bits)
-{
-    bits = (bits << 16u) | (bits >> 16u);
-    bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
-    bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
-    bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
-    bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-    return float(bits) * 2.3283064365386963e-10f;
-}
 
-float2 Hammersley(uint i, uint N)
-{
-    float2 result = float2(float(i) / float(N), RadicalInverse(i));
-    return result;
-}
 
 float2 pixel;
-uint pixelCurrent;
-int2 pixelAll;
 float _seed;
 StructuredBuffer<float> _randomBuffer;
 float rand()
@@ -247,19 +231,18 @@ void IntersectionBox(Ray ray, inout RayHit hit, Box box)
 }
 
 
-bool IntersectionBounds(Ray ray, inout RayHit hit, float3 pos, float3 size)
+bool IntersectionBounds(Ray ray, float3 pos, float3 size)
 {
     float3 ro = ray.origin - pos;
     float3 rd = ray.direction;
-    float3 m = 1.0 / rd; // can precompute if traversing a set of aligned boxes
-    float3 n = m * ro;   // can precompute if traversing a set of aligned boxes
+    float3 m = 1.0 / rd;
+    float3 n = m * ro;
     float3 k = abs(m) * size;
     float3 t1 = -n - k;
     float3 t2 = -n + k;
     float tN = max(max(t1.x, t1.y), t1.z);
     float tF = min(min(t2.x, t2.y), t2.z);
-    float t = tN;
-    if (tN > tF || tF < 0.0)
+    if(tN > tF || tF < 0.0)
     {
         return false;
     }
@@ -269,9 +252,9 @@ bool IntersectionBounds(Ray ray, inout RayHit hit, float3 pos, float3 size)
     }
 }
 
-bool IntersectMeshObjectBounds(Ray ray, inout RayHit hit, MeshObject meshObject)
+bool IntersectMeshObjectBounds(Ray ray, MeshObject meshObject)
 {
-    return IntersectionBounds(ray, hit, meshObject.position, meshObject.boundsSize / 2);
+    return IntersectionBounds(ray, meshObject.position, meshObject.boundsSize / 2);
 }
 
 bool IntersectTriangle(Ray ray,
@@ -370,31 +353,37 @@ float3 SampleHemisphere(float3 normal, float alpha)
     return mul(tangentSpaceDir, GetTangentSpace(normal));
 }
 
-float3 SampleHemisphereHammersley(float3 normal)
+float RadicalInverse(uint bits)
+{
+    bits = (bits << 16u) | (bits >> 16u);
+    bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+    bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+    bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+    bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+    return float(bits) * 2.3283064365386963e-10f;
+}
+
+int _hammersleyCurrent;
+int _hammersley;
+
+float2 Hammersley(uint i, uint N)
+{
+    float2 result = float2(float(i) / float(N), RadicalInverse(i));
+    return result;
+}
+float3 SampleGlobalsphereHammersley()
 {
     
 }
 
 float3 SampleGlobalsphere()
 {
-    //return normalize(float3(rand(), rand(), rand()) - float3(0.5, 0.5, 0.5));
+    float sita = PI * rand();
+    float fai = PI * 2 * rand();
     
-    float2 Xi = Hammersley(pixelCurrent, pixelAll);
-    Xi.x *= _ScreenSize.x;
-    Xi.y *= _ScreenSize.y;
-    float sita = Xi.x;
-    float fai = Xi.y;
-    
-    //float sita = PI * rand();
-    //float fai = 2 * PI * rand();
-    float r = 1;
-    float x = r * (sin(sita) * cos(fai));
-    float y = r * (sin(sita) * sin(fai));
-    float z = r * cos(sita);
-    
-    // float x = cos(xi.x) * sin(xi.y);
-    // float y = sin(xi.x) * sin(xi.y);
-    // float z = cos(xi.y);
+    float x = (sin(sita) * cos(fai));
+    float y = (sin(sita) * sin(fai));
+    float z = cos(sita);
     return float3(x, y, z);
 }
 
@@ -422,7 +411,7 @@ RayHit Trace(Ray ray)
     RayHit boundHit = bestHit;
     for (i = 0; i < _numMeshObjects; i ++)
     {
-        if (IntersectMeshObjectBounds(boundRay, boundHit, _MeshObjects[i]))
+        if (IntersectMeshObjectBounds(boundRay, _MeshObjects[i]))
         {
             IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
         }
@@ -535,8 +524,6 @@ float2 RandDisk()
 void CSMain(uint3 id: SV_DispatchThreadID)
 {
     pixel = id.xy;
-    pixelCurrent = _ScreenSize.x * id.y + id.x;
-    pixelAll = _ScreenSize.x * _ScreenSize.y;
     // Get the dimensions of the RenderTexture
     uint width = _ScreenSize.x;
     uint height = _ScreenSize.y;
@@ -559,10 +546,10 @@ void CSMain(uint3 id: SV_DispatchThreadID)
         Ray fogRay = ray;
         float screenDepth = 0;
         float3 sceneColor = SceneColor(sceneRay, screenDepth);
-        //final += sceneColor;
-        float3 fogColor = FogColor(fogRay, screenDepth);
-        final += fogColor ;
-        final = SampleGlobalsphere();
+        //float3 fogColor = FogColor(fogRay, screenDepth);
+        float fogInten = 0.0f;
+        // final += sceneColor * (1 - fogInten) + fogColor * fogInten;
+        final += sceneColor;
     }
     
     Result[pixel] += float4(final, 1);

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: New Ray Tracing Material Diffuse
   m_EditorClassIdentifier: 
   texture2D: {fileID: 0}
-  albedo: {r: 1, g: 1, b: 1, a: 1}
+  albedo: {r: 0.17030083, g: 0.8396226, b: 0.7553644, a: 1}
   specular: {r: 0, g: 0, b: 0, a: 1}
-  smoothness: 0
   emission: {r: 0, g: 0, b: 0, a: 1}
+  smoothness: 0.056

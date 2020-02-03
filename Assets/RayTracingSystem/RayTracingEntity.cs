@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
-[ExecuteAlways, AddComponentMenu("Ray Tracing/Ray Tracing Entity")]
+[AddComponentMenu("Ray Tracing/Ray Tracing Entity")]
 public class RayTracingEntity : MonoBehaviour
 {
     public enum EntityType
@@ -37,19 +37,23 @@ public class RayTracingEntity : MonoBehaviour
         transform.hasChanged = false;
         attributeChanged = false;
     }
-
+    private void OnDrawGizmos()
+    {
+        if (entityType == EntityType.Mesh && mesh != null)
+        {
+            Gizmos.color = Color.gray;
+            var matrix = Gizmos.matrix;
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawWireMesh(mesh, Vector3.zero, Quaternion.identity);
+            Gizmos.matrix = matrix;
+        }
+    }
     private void OnDrawGizmosSelected()
     {
         if (entityType == EntityType.Mesh && mesh != null)
         {
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireCube(bounds.center, bounds.size);
-
-            Gizmos.color = Color.gray;
-            var matrix = Gizmos.matrix;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawWireMesh(mesh, Vector3.zero, Quaternion.identity);
-            Gizmos.matrix = matrix;
         }
     }
 

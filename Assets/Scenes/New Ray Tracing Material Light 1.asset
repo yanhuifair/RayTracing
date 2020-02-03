@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 068c4b6aea34b450fadce611e044691e, type: 3}
-  m_Name: New Ray Tracing Material Light
+  m_Name: New Ray Tracing Material Light 1
   m_EditorClassIdentifier: 
   texture2D: {fileID: 0}
-  albedo: {r: 0, g: 0, b: 0, a: 1}
-  specular: {r: 1, g: 1, b: 1, a: 1}
+  albedo: {r: 1, g: 1, b: 1, a: 1}
+  specular: {r: 0, g: 0, b: 0, a: 1}
+  emission: {r: 0, g: 0.8831268, b: 5.2395535, a: 1}
   smoothness: 0
-  emission: {r: 4, g: 4, b: 4, a: 1}

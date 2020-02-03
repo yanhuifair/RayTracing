@@ -57,19 +57,25 @@ public class RayTracingWindow : EditorWindow
     void RefreshCameras()
     {
         cameras.Clear();
-
         var camerasFinded = Resources.FindObjectsOfTypeAll(typeof(Camera)) as Camera[];
         foreach (var camera in camerasFinded)
         {
             if (camera.gameObject.scene == null) continue;
             if (camera.gameObject.name == "Preview Scene Camera") continue;
+            if (camera.gameObject.name == "Preview Camera") continue;
             if (cameras.Contains(camera)) continue;
 
             cameras.Add(camera);
-            if (rayTracingSystem.camera == null)
+
+        }
+
+        foreach (var camera in cameras)
+        {
+            if (rayTracingSystem.camera == null && camera.name == "SceneCamera")
             {
                 rayTracingSystem.camera = camera;
                 rayTracingSystem.needReset = true;
+                RepaintEditor();
             }
         }
     }
@@ -81,7 +87,7 @@ public class RayTracingWindow : EditorWindow
 
         GUILayout.BeginHorizontal();
         rayTracingSystem.RayTracingComputeShader = EditorGUILayout.ObjectField("Compute Shader", rayTracingSystem.RayTracingComputeShader, typeof(ComputeShader), false) as ComputeShader;
-        rayTracingSystem.skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", rayTracingSystem.skyBoxTexture, typeof(UnityEngine.Object), false) as Texture2D;
+        rayTracingSystem.SkyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", rayTracingSystem.SkyBoxTexture, typeof(UnityEngine.Object), false) as Texture2D;
         GUILayout.EndHorizontal();
 
         //Camera
@@ -142,7 +148,7 @@ public class RayTracingWindow : EditorWindow
         //Sample
         GUILayout.BeginHorizontal();
         samplePerPixel = EditorGUILayout.IntSlider("Sample Per Pixel", samplePerPixel, 1, 100000);
-        rayTracingSystem.bounces = EditorGUILayout.IntSlider("Bounces", rayTracingSystem.bounces, 0, 4);
+        rayTracingSystem.bounces = EditorGUILayout.IntSlider("Bounces", rayTracingSystem.bounces, 0, 5);
         GUILayout.EndHorizontal();
 
         //Button
@@ -152,12 +158,12 @@ public class RayTracingWindow : EditorWindow
         {
             rayTracingSystem.ResetRenderTexture();
             rayTracingSystem.needReset = true;
-            WINDOW.Repaint();
+            RepaintEditor();
         }
         if (GUILayout.Button($"Interation ({samplePerPixel})", GUILayout.Width(position.width / 4 - spacing * 2)))
         {
             rayTracingSystem.samplePerPixel = samplePerPixel;
-            rayTracingSystem.needReset = true;
+            // rayTracingSystem.needReset = true;
             Interation();
         }
         if (GUILayout.RepeatButton("Interation Repeat"))
@@ -222,7 +228,7 @@ public class RayTracingWindow : EditorWindow
                 quaternionLast = rayTracingSystem.camera.transform.rotation;
                 rayTracingSystem.needReset = true;
 
-                WINDOW.Repaint();
+                RepaintEditor();
             }
         }
     }
@@ -232,7 +238,14 @@ public class RayTracingWindow : EditorWindow
         if (rayTracingSystem.camera != null)
         {
             renderTexture = rayTracingSystem.Render();
-            WINDOW.Repaint();
+
+            RepaintEditor();
         }
+    }
+
+    static void RepaintEditor()
+    {
+        //UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+        WINDOW.Repaint();
     }
 }

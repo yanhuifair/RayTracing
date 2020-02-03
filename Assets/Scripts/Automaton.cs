@@ -152,6 +152,7 @@ public class Automaton : MonoBehaviour
             computeShader.Dispatch(kernalHandle, spaceSize / 8, spaceSize / 8, spaceSize / 8);
 
             outbuffer.GetData(Cells);
+            outbuffer.Release();
         }
 
         //

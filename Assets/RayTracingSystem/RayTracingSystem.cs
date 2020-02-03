@@ -47,7 +47,7 @@ public class RayTracingSystem
         }
     }
     public int samplePerPixel = 1;
-    public int bounces = 4;
+    public int bounces = 3;
     public Vector2 resolution = new Vector2(1280, 720);
     public Texture2D skyBoxTexture;
     public Texture2D SkyBoxTexture
@@ -60,6 +60,10 @@ public class RayTracingSystem
                 skyBoxTexture.Apply();
             }
             return skyBoxTexture;
+        }
+        set
+        {
+            skyBoxTexture = value;
         }
     }
 
@@ -123,7 +127,6 @@ public class RayTracingSystem
         if (renderTextureOut != null) renderTextureOut.Release();
         renderTextureOut = null;
 
-        sampleCount = 0;
         return GetRenderTextureAdd;
     }
     public Camera camera;
@@ -133,6 +136,7 @@ public class RayTracingSystem
     public float circleOfConfusion = 0;
 
     public int sampleCount = 0;
+    public int _hammersleyCurrent = 0;
     //Scene
     //List<RayTracingEntity> RayTracingEntities = new List<RayTracingEntity>();
     public RayTracingEntity[] RayTracingEntities;
@@ -362,7 +366,7 @@ public class RayTracingSystem
             // If no data or buffer doesn't match the given criteria, release it
             if (data.Count == 0 || buffer.count != data.Count || buffer.stride != stride)
             {
-                buffer.Release();
+                buffer.Dispose();
                 buffer = null;
             }
         }
@@ -373,7 +377,7 @@ public class RayTracingSystem
             // begin with, create it
             if (buffer != null)
             {
-                buffer.Release();
+                buffer.Dispose();
             }
             buffer = new ComputeBuffer(data.Count, stride);
             // Set data on the buffer
@@ -386,6 +390,7 @@ public class RayTracingSystem
     void SetupRandom(int samplePerPixel)
     {
         randList.Clear();
+        UnityEngine.Random.InitState(System.DateTime.Now.Millisecond);
         for (int i = 0; i < samplePerPixel; i++)
         {
             randList.Add(UnityEngine.Random.value);
@@ -462,11 +467,18 @@ public class RayTracingSystem
         }
     }
 
+    void ResetParameters()
+    {
+        _hammersleyCurrent = 0;
+        sampleCount = 0;
+    }
+
     void SetShaderParameters()
     {
         //Camera
         RayTracingComputeShader.SetFloat("_farClipPlane", camera.farClipPlane);
-        RayTracingComputeShader.SetFloat("_focus", focusObject?Vector3.Distance(focusObject.transform.position, camera.transform.position) : focus);
+        RayTracingComputeShader.SetFloat("_focus",
+            focusObject?Vector3.Distance(focusObject.transform.position, camera.transform.position) : focus);
         RayTracingComputeShader.SetFloat("_circleOfConfusion", circleOfConfusion);
         RayTracingComputeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         RayTracingComputeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
@@ -480,11 +492,15 @@ public class RayTracingSystem
         RayTracingComputeShader.SetInt("_bounces", bounces);
         RayTracingComputeShader.SetInt("_samplePerPixel", samplePerPixel);
 
+        //Random
         SetupRandom(samplePerPixel);
         SetComputeBuffer("_randomBuffer", randomBuffer);
         RayTracingComputeShader.SetFloat("_seed", UnityEngine.Random.value);
         RayTracingComputeShader.SetInt("_dimension", 0);
         RayTracingComputeShader.SetInt("_randomIndex", 0);
+        RayTracingComputeShader.SetInt("_hammersleyCurrent", _hammersleyCurrent);
+        RayTracingComputeShader.SetInt("_hammersley", 1024);
+        _hammersleyCurrent++;
 
         sampleCount += samplePerPixel;
         RayTracingComputeShader.SetInt("_sampleCount", sampleCount);
@@ -530,9 +546,10 @@ public class RayTracingSystem
 
         if (needReset)
         {
+            ResetRenderTexture();
             SetupMaterials();
             SetupScene();
-            ResetRenderTexture();
+            ResetParameters();
             needReset = false;
         }
 
