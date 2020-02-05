@@ -116,10 +116,11 @@ public class RayTracingWindow : EditorWindow
         //Resolution
         GUILayout.BeginHorizontal();
         EditorGUI.BeginDisabledGroup(true);
-        var x = EditorGUILayout.FloatField("Width", resolution.x);
-        var y = EditorGUILayout.FloatField("Height", resolution.y);
+        EditorGUILayout.LabelField("Resolution", $"{resolution.x} * {resolution.y}");
+        // var x = EditorGUILayout.FloatField("Width", resolution.x);
+        // var y = EditorGUILayout.FloatField("Height", resolution.y);
         EditorGUI.EndDisabledGroup();
-        resolutionScale = EditorGUILayout.Slider("Scale", resolutionScale, 0.1f, 2f);
+        resolutionScale = EditorGUILayout.Slider("", resolutionScale, 0.1f, 2f);
         GUILayout.EndHorizontal();
 
         //Dof

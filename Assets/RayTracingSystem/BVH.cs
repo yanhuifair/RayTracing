@@ -36,14 +36,19 @@ public class BVHNode
 
 }
 
+[ExecuteInEditMode]
 public class BVH : MonoBehaviour
 {
     public int maxDepth = 3;
     public int maxTriangle = 100;
-    [HideInInspector] public BVHNode nodeRoot;
+    public bool showMesh;
+    public bool showBounds;
+    public BVHNode nodeRoot;
     Mesh meshStatic;
+    Mesh meshDynamic;
+
     [Button]
-    public void Init()
+    public void Combine()
     {
         meshStatic = new Mesh();
         List<CombineInstance> combines = new List<CombineInstance>();
@@ -53,7 +58,8 @@ public class BVH : MonoBehaviour
             if (entity.entityType == RayTracingEntity.EntityType.Mesh
                 && entity.mesh != null
                 && entity.rayTracingMaterial != null
-                && entity.gameObject.activeInHierarchy == true)
+                && entity.gameObject.activeInHierarchy == true
+                && entity.gameObject.isStatic == true)
             {
                 CombineInstance c = new CombineInstance();
                 c.mesh = entity.mesh;
@@ -61,8 +67,14 @@ public class BVH : MonoBehaviour
                 combines.Add(c);
             }
         }
-        meshStatic.CombineMeshes(combines.ToArray());
+        if (combines.Count > 0) meshStatic.CombineMeshes(combines.ToArray());
 
+        Debug.Log($"Combine Mesh {meshStatic.triangles.Length/3}");
+    }
+
+    [Button]
+    public void Cut()
+    {
         nodeRoot = new BVHNode();
         nodeRoot.depth = 0;
         nodeRoot.bounds = GeometryUtility.CalculateBounds(meshStatic.vertices, Matrix4x4.identity);
@@ -81,6 +93,7 @@ public class BVH : MonoBehaviour
             nodeRoot.triangles.Add(t);
         }
 
+        Debug.Log($"Cut Node {nodeRoot.triangles.Count}");
         CutNode(nodeRoot);
     }
 
@@ -93,7 +106,7 @@ public class BVH : MonoBehaviour
     void CutNode(BVHNode node)
     {
         if (node.triangles.Count == 0) return;
-        if (node.depth < maxDepth || node.depth < maxDepth)
+        if (node.depth < maxDepth || node.triangles.Count > maxTriangle)
         {
             float sah = 0.5f;
             float random = UnityEngine.Random.value;
@@ -173,11 +186,17 @@ public class BVH : MonoBehaviour
     {
         if (meshStatic != null)
         {
-            Gizmos.color = Color.gray;
-            Gizmos.DrawWireMesh(meshStatic, Vector3.zero, Quaternion.identity);
+            if (showMesh)
+            {
+                Gizmos.color = Color.gray;
+                Gizmos.DrawWireMesh(meshStatic, Vector3.zero, Quaternion.identity);
+            }
         }
-        Gizmos.color = Color.cyan;
-        DrawBound(nodeRoot);
+
+        if (showBounds)
+        {
+            DrawBound(nodeRoot);
+        }
     }
 
     void DrawBound(BVHNode node)
@@ -187,8 +206,9 @@ public class BVH : MonoBehaviour
             var bounds = node.bounds;
             if (bounds != null && node.triangles.Count > 0)
             {
-                //Gizmos.color = (Color.white / (float) depth) * (float) node.depth;
                 Handles.Label(bounds.center, $"{node.triangles.Count}");
+                float c = (float) node.depth / (float) maxDepth;
+                Gizmos.color = new Color(c, c, c);
                 Gizmos.DrawWireCube(bounds.center, bounds.size);
             }
 
