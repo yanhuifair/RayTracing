@@ -41,7 +41,7 @@ public class RayTracingEntity : MonoBehaviour
     {
         if (entityType == EntityType.Mesh && mesh != null)
         {
-            Gizmos.color = Color.gray;
+            Gizmos.color = Color.white;
             var matrix = Gizmos.matrix;
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.DrawWireMesh(mesh, Vector3.zero, Quaternion.identity);
