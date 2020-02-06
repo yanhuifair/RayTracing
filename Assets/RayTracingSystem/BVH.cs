@@ -38,6 +38,7 @@ public class BVHNode
     public int index;
     public int depth;
     public Bounds bounds;
+    public bool cuted;
     public BVHNode subNode0;
     public BVHNode subNode1;
     public List<Vector3> vertices = new List<Vector3>();
@@ -48,7 +49,7 @@ public class BVHNode
 [ExecuteInEditMode]
 public class BVH : MonoBehaviour
 {
-    [Range(0, 10)] public int maxDepth = 3;
+    [ReadOnly] public int maxDepth = 3;
     public bool showMesh;
     public bool showBounds;
     [HideInInspector] public BVHNode nodeRoot;
@@ -81,7 +82,7 @@ public class BVH : MonoBehaviour
     }
 
     [Button]
-    public void Cut()
+    public void ResetBVH()
     {
         nodeRoot = new BVHNode();
         nodeRoot.depth = 0;
@@ -100,16 +101,14 @@ public class BVH : MonoBehaviour
             };
             nodeRoot.triangles.Add(t);
         }
+        maxDepth = 0;
+    }
 
-        Debug.Log($"Cut Node {nodeRoot.triangles.Count}");
-        if (nodeRoot.triangles.Count > 0)
-        {
-            CutNode(nodeRoot);
-        }
-        else
-        {
-            Debug.LogWarning("Triangles None");
-        }
+    [Button]
+    public void Cut()
+    {
+        maxDepth += 1;
+        CutNode(nodeRoot);
     }
 
     enum CutPlane
@@ -120,51 +119,56 @@ public class BVH : MonoBehaviour
     }
     void CutNode(BVHNode node)
     {
-        if (node.triangles.Count == 0) return;
+        if (node == null) return;
         if (node.depth < maxDepth)
         {
-            //CaculatePlane
-            Bounds b0 = new Bounds(), b1 = new Bounds();
-            CutBounds(node.bounds, ref b0, ref b1, 0.5f, CutPlane.x);
-            float fx = CaculateBoundsFangcha(node, b0, b1);
-
-            CutBounds(node.bounds, ref b0, ref b1, 0.5f, CutPlane.y);
-            float fy = CaculateBoundsFangcha(node, b0, b1);
-
-            CutBounds(node.bounds, ref b0, ref b1, 0.5f, CutPlane.z);
-            float fz = CaculateBoundsFangcha(node, b0, b1);
-
-            Dictionary<CutPlane, float> dic = new Dictionary<CutPlane, float>();
-            dic.Add(CutPlane.x, fx);
-            dic.Add(CutPlane.y, fy);
-            dic.Add(CutPlane.z, fz);
-            var result = dic.OrderByDescending(d => d.Value);
-            var cutPlane = result.First().Key;
-
-            //Create subnode
-            node.subNode0 = new BVHNode();
-            node.subNode0.depth = node.depth + 1;
-            node.subNode0.index = 2 * node.index;
-
-            node.subNode1 = new BVHNode();
-            node.subNode1.depth = node.depth + 1;
-            node.subNode0.index = 2 * node.index + 1;
-
-            float sah = 0.5f;
-            CutBounds(node.bounds, ref node.subNode0.bounds, ref node.subNode1.bounds, sah, cutPlane);
-
-            foreach (var t in node.triangles)
+            if (node.cuted == false && node.triangles.Count > 0)
             {
-                if (node.subNode0.bounds.Intersects(t.GetBounds()))
+                //CaculatePlane
+                Bounds b0 = new Bounds(), b1 = new Bounds();
+                CutBounds(node.bounds, ref b0, ref b1, 0.5f, CutPlane.x);
+                float fx = CaculateBoundsFangcha(node, b0, b1);
+
+                CutBounds(node.bounds, ref b0, ref b1, 0.5f, CutPlane.y);
+                float fy = CaculateBoundsFangcha(node, b0, b1);
+
+                CutBounds(node.bounds, ref b0, ref b1, 0.5f, CutPlane.z);
+                float fz = CaculateBoundsFangcha(node, b0, b1);
+
+                Dictionary<CutPlane, float> dic = new Dictionary<CutPlane, float>();
+                dic.Add(CutPlane.x, fx);
+                dic.Add(CutPlane.y, fy);
+                dic.Add(CutPlane.z, fz);
+                var result = dic.OrderByDescending(d => d.Value);
+                var cutPlane = result.First().Key;
+
+                //Create subnode
+                node.subNode0 = new BVHNode();
+                node.subNode0.depth = node.depth + 1;
+                node.subNode0.index = 2 * node.index;
+
+                node.subNode1 = new BVHNode();
+                node.subNode1.depth = node.depth + 1;
+                node.subNode0.index = 2 * node.index + 1;
+
+                float sah = 0.5f;
+                CutBounds(node.bounds, ref node.subNode0.bounds, ref node.subNode1.bounds, sah, cutPlane);
+
+                foreach (var t in node.triangles)
                 {
-                    node.subNode0.triangles.Add(t);
+                    if (node.subNode0.bounds.Intersects(t.GetBounds()))
+                    {
+                        node.subNode0.triangles.Add(t);
+                    }
+                    if (node.subNode1.bounds.Intersects(t.GetBounds()))
+                    {
+                        node.subNode1.triangles.Add(t);
+                    }
                 }
-                if (node.subNode1.bounds.Intersects(t.GetBounds()))
-                {
-                    node.subNode1.triangles.Add(t);
-                }
+                node.triangles.Clear();
+                node.cuted = true;
             }
-            node.triangles.Clear();
+
             CutNode(node.subNode0);
             CutNode(node.subNode1);
         }
