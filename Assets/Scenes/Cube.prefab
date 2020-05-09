@@ -18,7 +18,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &6223527254401959482
 Transform:
@@ -109,7 +109,6 @@ MonoBehaviour:
   entityType: 0
   radius: 1
   boxSize: {x: 1, y: 1, z: 1}
-  albedo: {r: 1, g: 1, b: 1, a: 1}
-  specular: {r: 0, g: 0, b: 0, a: 1}
-  smoothness: 0
-  emission: {r: 0, g: 0, b: 0, a: 0}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  rayTracingMaterial: {fileID: 11400000, guid: b5e6f693ae67d49ffa71e6dda40e905d, type: 2}
+  attributeChanged: 1

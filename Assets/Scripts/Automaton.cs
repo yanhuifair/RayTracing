@@ -28,9 +28,6 @@ public class Automaton : MonoBehaviour
     struct Cell
     {
         public int state;
-        public float x;
-        public float y;
-        public float z;
     }
 
     [SerializeField] Cell[, , ] cells;
@@ -47,6 +44,15 @@ public class Automaton : MonoBehaviour
     }
     public GameObject cube;
     public GameObject parent;
+    public GameObject Parent
+    {
+        get
+        {
+            if (parent == null) parent = new GameObject();
+            return parent;
+        }
+    }
+
     [SerializeField] GameObject[, , ] gameObjects;
     GameObject[, , ] GameObjects
     {
@@ -146,6 +152,7 @@ public class Automaton : MonoBehaviour
             computeShader.Dispatch(kernalHandle, spaceSize / 8, spaceSize / 8, spaceSize / 8);
 
             outbuffer.GetData(Cells);
+            outbuffer.Release();
         }
 
         //
@@ -190,7 +197,7 @@ public class Automaton : MonoBehaviour
                             if (GameObjects[x, y, z] == null)
                             {
                                 GameObjects[x, y, z] = PrefabUtility.InstantiatePrefab(cube) as GameObject;
-                                GameObjects[x, y, z].transform.parent = parent.transform;
+                                GameObjects[x, y, z].transform.parent = Parent.transform;
                                 GameObjects[x, y, z].transform.position = new Vector3(x, y, z);
                                 GameObjects[x, y, z].SetActive(Cells[x, y, z].state > 0);
                             }
@@ -208,22 +215,22 @@ public class Automaton : MonoBehaviour
     {
         Gizmos.DrawWireCube(new Vector3(spaceSize / 2, spaceSize / 2, spaceSize / 2), Vector3.one * spaceSize);
 
-        return;
-        for (int x = 0; x < spaceSize; x++)
-        {
-            for (int y = 0; y < spaceSize; y++)
-            {
-                for (int z = 0; z < spaceSize; z++)
-                {
-                    if (Cells[x, y, z].state > 0)
-                    {
-                        if (useGradient) Gizmos.color = gradient.Evaluate((float) Cells[x, y, z].state / stateMax);
-                        // Gizmos.DrawWireCube(new Vector3(x, y, z), Vector3.one * Cells[x, y, z].state / stateMax);
-                        //Gizmos.DrawWireCube(new Vector3(x, y, z), Vector3.one);
-                        Gizmos.DrawCube(new Vector3(x, y, z), Vector3.one);
-                    }
-                }
-            }
-        }
+        // return;
+        // for (int x = 0; x < spaceSize; x++)
+        // {
+        //     for (int y = 0; y < spaceSize; y++)
+        //     {
+        //         for (int z = 0; z < spaceSize; z++)
+        //         {
+        //             if (Cells[x, y, z].state > 0)
+        //             {
+        //                 if (useGradient) Gizmos.color = gradient.Evaluate((float) Cells[x, y, z].state / stateMax);
+        //                 // Gizmos.DrawWireCube(new Vector3(x, y, z), Vector3.one * Cells[x, y, z].state / stateMax);
+        //                 //Gizmos.DrawWireCube(new Vector3(x, y, z), Vector3.one);
+        //                 Gizmos.DrawCube(new Vector3(x, y, z), Vector3.one);
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

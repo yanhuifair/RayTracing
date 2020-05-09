@@ -176,10 +176,10 @@ public class RayTracingCamera : MonoBehaviour
                 sphere.position = item.transform.position;
                 sphere.rotation = item.transform.rotation.eulerAngles;
                 sphere.radius = item.radius / 2.0f;
-                sphere.albedo = ColorToVector3(item.albedo);
-                sphere.specular = ColorToVector3(item.specular);
-                sphere.smoothness = item.smoothness;
-                sphere.emission = ColorToVector3(item.emission);
+                sphere.albedo = ColorToVector3(item.rayTracingMaterial.albedo);
+                sphere.specular = ColorToVector3(item.rayTracingMaterial.specular);
+                sphere.smoothness = item.rayTracingMaterial.smoothness;
+                sphere.emission = ColorToVector3(item.rayTracingMaterial.emission);
                 spheres.Add(sphere);
             }
         }
@@ -211,10 +211,10 @@ public class RayTracingCamera : MonoBehaviour
                 box.position = item.transform.position;
                 box.rotation = item.transform.rotation.eulerAngles;
                 box.size = item.boxSize;
-                box.albedo = ColorToVector3(item.albedo);
-                box.specular = ColorToVector3(item.specular);
-                box.smoothness = item.smoothness;
-                box.emission = ColorToVector3(item.emission);
+                box.albedo = ColorToVector3(item.rayTracingMaterial.albedo);
+                box.specular = ColorToVector3(item.rayTracingMaterial.specular);
+                box.smoothness = item.rayTracingMaterial.smoothness;
+                box.emission = ColorToVector3(item.rayTracingMaterial.emission);
                 boxs.Add(box);
             }
         }
@@ -269,10 +269,10 @@ public class RayTracingCamera : MonoBehaviour
                         indices_offset = firstIndex,
                         indices_count = indices.Length,
 
-                        albedo = ColorToVector3(item.albedo),
-                        specular = ColorToVector3(item.specular),
-                        smoothness = item.smoothness,
-                        emission = ColorToVector3(item.emission),
+                        albedo = ColorToVector3(item.rayTracingMaterial.albedo),
+                        specular = ColorToVector3(item.rayTracingMaterial.specular),
+                        smoothness = item.rayTracingMaterial.smoothness,
+                        emission = ColorToVector3(item.rayTracingMaterial.emission),
                 });
             }
         }

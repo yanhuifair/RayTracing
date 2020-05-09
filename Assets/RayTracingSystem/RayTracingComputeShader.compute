@@ -1,5 +1,7 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
-#pragma kernel CSMain
+
+
+// #include "Random.compute"
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
@@ -10,27 +12,29 @@ float4x4 _CameraInverseProjection;
 
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
+
 static const float PI = 3.14159265f;
 static const float EPSILON = 1e-8;
+static const float GAMMA = 0.454545f;
 
 float2 _PixelOffset;
 
 float3 _ScreenSize;
-uint _depth;
-uint _SamplePerPixel;
-float _CameraFar;
-uint _layerCount;
+uint _bounces;
+uint _samplePerPixel;
+float _farClipPlane;
+uint _sampleCount;
+
+//DOF
+float _focus;
+float _circleOfConfusion;
 
 struct Sphere
 {
     float3 position;
     float3 rotation;
     float radius;
-    
-    float3 albedo;
-    float3 specular;
-    float smoothness;
-    float3 emission;
+    int materialIndex;
 };
 StructuredBuffer<Sphere> _Spheres;
 uint _numSpheres;
@@ -42,11 +46,7 @@ struct Box
     float3 position;
     float3 rotation;
     float3 size;
-    
-    float3 albedo;
-    float3 specular;
-    float smoothness;
-    float3 emission;
+    int materialIndex;
 };
 StructuredBuffer<Box> _Boxs;
 uint _numBoxs;
@@ -54,20 +54,31 @@ uint _numBoxs;
 
 struct MeshObject
 {
+    float3 position;
+    float3 boundsSize;
     float4x4 localToWorldMatrix;
     int indices_offset;
     int indices_count;
-    
-    float3 albedo;
-    float3 specular;
-    float smoothness;
-    float3 emission;
+    int materialIndex;
 };
 uint _numMeshObjects;
 
 StructuredBuffer<MeshObject> _MeshObjects;
 StructuredBuffer<float3> _Vertices;
 StructuredBuffer<int> _Indices;
+
+
+
+struct MaterialInfo
+{
+    int textureIndex;
+    float3 albedo;
+    float3 specular;
+    float smoothness;
+    float3 emission;
+};
+StructuredBuffer<MaterialInfo> _materialBuffer;
+Texture2DArray<float4> _materialTextures;
 
 struct Ray
 {
@@ -87,16 +98,22 @@ struct RayHit
     float smoothness;
     float3 emission;
     
+    int hitIndex;
     bool hited;
 };
 
 
-float2 _Pixel;
-float _Seed;
+uint _dimension;
+uint _randomIndex;
+
+
+float2 pixel;
+float _seed;
+StructuredBuffer<float> _randomBuffer;
 float rand()
 {
-    float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
-    _Seed += 1.0f;
+    float result = frac(sin(_seed / 100.0f * dot(pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
+    _seed += 1.0f;
     return result;
 }
 
@@ -104,12 +121,14 @@ RayHit CreateRayHit()
 {
     RayHit hit;
     hit.position = float3(0, 0, 0);
-    hit.distance = _CameraFar;
+    // hit.distance = _farClipPlane;
+    hit.distance = 1.#INF;
     hit.normal = float3(0, 0, 0);
     hit.albedo = float3(0.1, 0.1, 0.1);
     hit.specular = float3(0.0, 0.0, 0.0);
     hit.smoothness = 0;
     hit.emission = float3(0.0, 0.0, 0.0);
+    hit.hitIndex = 0;
     hit.hited = false;
     return hit;
 }
@@ -160,15 +179,17 @@ void IntersectSphere(Ray ray, inout RayHit hit, Sphere sphere)
         return;
     float p2 = sqrt(p2sqr);
     float t = p1 - p2 > 0 ? p1 - p2: p1 + p2;
-    if(t > 0 && t < _CameraFar && t < hit.distance)
+    if(t > 0 && t < _farClipPlane && t < hit.distance)
     {
+        MaterialInfo materialInfo = _materialBuffer[sphere.materialIndex];
+        
         hit.distance = t;
         hit.position = ray.origin + t * ray.direction;
         hit.normal = normalize(hit.position - sphere.position);
-        hit.albedo = sphere.albedo;
-        hit.specular = sphere.specular;
-        hit.smoothness = sphere.smoothness;
-        hit.emission = sphere.emission;
+        hit.albedo = materialInfo.albedo;
+        hit.specular = materialInfo.specular;
+        hit.smoothness = materialInfo.smoothness;
+        hit.emission = materialInfo.emission;
         hit.hited = true;
     }
 }
@@ -177,14 +198,6 @@ void IntersectSphere(Ray ray, inout RayHit hit, Sphere sphere)
 // axis aligned box centered at the origin, with size boxSize
 void IntersectionBox(Ray ray, inout RayHit hit, Box box)
 {
-    // box.position = mul(box.localToWorldMatrix, box.position);
-    // box.rotation = mul(box.localToWorldMatrix, box.rotation);
-    //box.size = mul(box.localToWorldMatrix, box.size);
-    
-    //ray.origin = mul(box.localToWorldMatrix, ray.origin);
-    //ray.direction = mul(box.localToWorldMatrix, ray.direction);
-    
-    
     float3 ro = ray.origin;
     float3 rd = ray.direction;
     float3 m = 1.0 / rd; // can precompute if traversing a set of aligned boxes
@@ -199,24 +212,53 @@ void IntersectionBox(Ray ray, inout RayHit hit, Box box)
     {
         hit.hited = false;
     }
-    else
+    else//Hited
     {
-        if(t > 0 && t < _CameraFar && t < hit.distance)
+        if (t > 0 && t < _farClipPlane && t < hit.distance)
         {
+            MaterialInfo materialInfo = _materialBuffer[box.materialIndex];
+            
             hit.distance = t;
             hit.position = ray.origin + t * ray.direction;
             hit.normal = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);
-            hit.albedo = box.albedo;
-            hit.specular = box.specular;
-            hit.smoothness = box.smoothness;
-            hit.emission = box.emission;
+            hit.albedo = materialInfo.albedo;
+            hit.specular = materialInfo.specular;
+            hit.smoothness = materialInfo.smoothness;
+            hit.emission = materialInfo.emission;
             hit.hited = true;
         }
     }
 }
 
 
-bool IntersectTriangle(Ray ray, float3 vert0, float3 vert1, float3 vert2,
+bool IntersectionBounds(Ray ray, float3 pos, float3 size)
+{
+    float3 ro = ray.origin - pos;
+    float3 rd = ray.direction;
+    float3 m = 1.0 / rd;
+    float3 n = m * ro;
+    float3 k = abs(m) * size;
+    float3 t1 = -n - k;
+    float3 t2 = -n + k;
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+    if(tN > tF || tF < 0.0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool IntersectMeshObjectBounds(Ray ray, MeshObject meshObject)
+{
+    return IntersectionBounds(ray, meshObject.position, meshObject.boundsSize / 2);
+}
+
+bool IntersectTriangle(Ray ray,
+float3 vert0, float3 vert1, float3 vert2,
 inout float t, inout float u, inout float v)
 {
     // find vectors for two edges sharing vert0
@@ -255,6 +297,8 @@ inout float t, inout float u, inout float v)
     return true;
 }
 
+
+
 void IntersectMeshObject(Ray ray, inout RayHit hit, MeshObject meshObject)
 {
     uint offset = meshObject.indices_offset;
@@ -268,15 +312,17 @@ void IntersectMeshObject(Ray ray, inout RayHit hit, MeshObject meshObject)
         float t, u, v;
         if (IntersectTriangle(ray, v0, v1, v2, t, u, v))
         {
-            if(t > 0 && t < _CameraFar && t < hit.distance)
+            if(t > 0 && t < _farClipPlane && t < hit.distance)
             {
+                MaterialInfo materialInfo = _materialBuffer[meshObject.materialIndex];
+                
                 hit.distance = t;
                 hit.position = ray.origin + t * ray.direction;
                 hit.normal = normalize(cross(v1 - v0, v2 - v0));
-                hit.albedo = meshObject.albedo;
-                hit.specular = meshObject.specular;
-                hit.smoothness = meshObject.smoothness;
-                hit.emission = meshObject.emission;
+                hit.albedo = materialInfo.albedo;
+                hit.specular = materialInfo.specular;
+                hit.smoothness = materialInfo.smoothness;
+                hit.emission = materialInfo.emission;
                 hit.hited = true;
             }
         }
@@ -299,7 +345,7 @@ float3x3 GetTangentSpace(float3 normal)
 float3 SampleHemisphere(float3 normal, float alpha)
 {
     // Sample the hemisphere, where alpha determines the kind of the sampling
-    float cosTheta = pow(rand(), 1.0f / (alpha + 1.0f));
+    float cosTheta = pow(abs(rand()), 1.0f / (alpha + 1.0f));
     float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
     float phi = 2 * PI * rand();
     float3 tangentSpaceDir = float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
@@ -307,16 +353,45 @@ float3 SampleHemisphere(float3 normal, float alpha)
     return mul(tangentSpaceDir, GetTangentSpace(normal));
 }
 
+float RadicalInverse(uint bits)
+{
+    bits = (bits << 16u) | (bits >> 16u);
+    bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+    bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+    bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+    bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+    return float(bits) * 2.3283064365386963e-10f;
+}
+
+int _hammersleyCurrent;
+int _hammersley;
+
+float2 Hammersley(uint i, uint N)
+{
+    float2 result = float2(float(i) / float(N), RadicalInverse(i));
+    return result;
+}
+float3 SampleGlobalsphereHammersley()
+{
+    
+}
+
 float3 SampleGlobalsphere()
 {
-    return normalize(float3(rand(), rand(), rand()) - float3(0.5, 0.5, 0.5));
+    float sita = PI * rand();
+    float fai = PI * 2 * rand();
+    
+    float x = (sin(sita) * cos(fai));
+    float y = (sin(sita) * sin(fai));
+    float z = cos(sita);
+    return float3(x, y, z);
 }
 
 
 RayHit Trace(Ray ray)
 {
     RayHit bestHit = CreateRayHit();
-    uint i;
+    uint count, stride, i;
     // Trace ground plane
     //IntersectGroundPlane(ray, bestHit);
     
@@ -327,16 +402,21 @@ RayHit Trace(Ray ray)
     }
     
     // Trace Box
-    for (i = 0; i < _numBoxs; i ++)
+    //for (i = 0; i < _numBoxs; i ++)
     {
-        IntersectionBox(ray, bestHit, _Boxs[i]);
+        //IntersectionBox(ray, bestHit, _Boxs[i]);
     }
     
-    // Trace mesh objects
+    Ray boundRay = ray;
+    RayHit boundHit = bestHit;
     for (i = 0; i < _numMeshObjects; i ++)
     {
-        IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+        if (IntersectMeshObjectBounds(boundRay, _MeshObjects[i]))
+        {
+            IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+        }
     }
+    
     return bestHit;
 }
 
@@ -350,11 +430,11 @@ float energy(float3 color)
 }
 float SmoothnessToPhongAlpha(float s)
 {
-    return pow(10000000.0f, s * s);
+    return pow(1000000.0f, s * s);
 }
 float3 Shade(inout Ray ray, RayHit hit)
 {
-    if (hit.hited)
+    if(hit.hited)
     {
         hit.albedo = min(1.0f - hit.specular, hit.albedo);
         float specChance = energy(hit.specular);
@@ -373,19 +453,25 @@ float3 Shade(inout Ray ray, RayHit hit)
             float f = (alpha + 2) / (alpha + 1);
             ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
         }
-        else
+        else if (diffChance > 0 && roulette < specChance + diffChance)
         {
             // Diffuse reflection
             ray.origin = hit.position + hit.normal * 0.001f;
             ray.direction = SampleHemisphere(hit.normal, 1.0f);
             ray.energy *= (1.0f / diffChance) * hit.albedo;
         }
+        else
+        {
+            // Terminate ray
+            ray.energy = 0.0f;
+        }
         return hit.emission;
     }
     else
     {
-        return float3(1, 0, 0);
+        // Erase the ray's energy - the sky doesn't reflect anything
         ray.energy = 0.0f;
+        
         // Sample the skybox and write it
         float theta = acos(ray.direction.y) / - PI;
         float phi = atan2(ray.direction.x, -ray.direction.z) / - PI * 0.5f;
@@ -393,68 +479,81 @@ float3 Shade(inout Ray ray, RayHit hit)
     }
 }
 
-[numthreads(8, 8, 1)]
-void CSMain(uint3 id: SV_DispatchThreadID)
+float3 SceneColor(Ray ray, inout float screenDepth)
 {
-    _Pixel = id.xy;
-    // Get the dimensions of the RenderTexture
-    uint width = _ScreenSize.x;
-    uint height = _ScreenSize.y;
-    
-    // Transform pixel to [-1,1] range
-    float2 uv = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
-    
-    
-    
-    uint i;
-    // Get a ray for the UVs
-    Ray ray = CreateCameraRay(uv);
-    Ray sceneRay = ray;
     float3 sceneColor = float3(0, 0, 0);
-    float fristInpatchDistance;
-    for (i = 0; i < _depth; i ++)
+    for (uint i = 0; i <= _bounces; i ++)
     {
-        RayHit hit = Trace(sceneRay);
+        RayHit hit = Trace(ray);
         if (hit.hited)
         {
             if(i == 0)
             {
-                fristInpatchDistance = hit.distance;
+                screenDepth = hit.distance;
             }
-            sceneColor += ray.energy * Shade(sceneRay, hit);
-            if(!any(sceneRay.energy))break;
         }
-        else
-        {
-            break;
-        }
+        sceneColor += Shade(ray, hit) * ray.energy;
+        if(!any(ray.energy))break;
     }
-    //sceneColor /= _SamplePerPixel;
+    return sceneColor;
+}
+
+float3 FogColor(Ray ray, float screenDepth)
+{
+    float3 fogColor = float3(0, 0, 0);
+    float3 currentPos = ray.origin +
+    ray.direction * (screenDepth * rand());
     
-    Ray rayMarching = ray;
-    float3 marchingColor = float3(0, 0, 0);
-    uint cycle = 1;
-    uint marchAdd = 0;
-    for (i = 0; i < cycle; i ++)
+    Ray r = CreateRay(currentPos, SampleGlobalsphere());
+    RayHit hit = Trace(r);
+    if(hit.hited)
     {
-        float3 currentPos = rayMarching.origin +
-        rayMarching.direction * (fristInpatchDistance * rand());
-        
-        Ray r = CreateRay(currentPos, SampleGlobalsphere());
-        RayHit hit = Trace(r);
-        if (hit.hited)
-        {
-            marchingColor += hit.emission * r.energy;
-            marchAdd += 1;
-        }
+        fogColor += hit.emission * r.energy;
     }
-    if(marchAdd > 1)marchingColor /= marchAdd;
+    return fogColor ;
+}
+
+float2 RandDisk()
+{
+    return float2(rand(), rand());
+}
+
+
+#pragma kernel CSMain
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id: SV_DispatchThreadID)
+{
+    pixel = id.xy;
+    // Get the dimensions of the RenderTexture
+    uint width = _ScreenSize.x;
+    uint height = _ScreenSize.y;
+    // Transform pixel to [-1,1] range
+    float2 uv = float2((pixel + _PixelOffset * rand()) / float2(width, height) * 2.0f - 1.0f) ;
     
-    float3 final = sceneColor;
-    final += marchingColor * 1;
+    float3 final = float3(0, 0, 0);
+    for (uint spp = 0; spp < _samplePerPixel; spp ++)
+    {
+        //Random
+        _seed = _randomBuffer[spp];
+        
+        Ray ray = CreateCameraRay(uv);
+        //Dof
+        float3 foucePos = ray.origin + ray.direction * _focus;
+        ray.origin += cross(SampleGlobalsphere(), ray.direction) * _circleOfConfusion;
+        ray.direction = normalize(foucePos - ray.origin);
+        //
+        Ray sceneRay = ray;
+        Ray fogRay = ray;
+        float screenDepth = 0;
+        float3 sceneColor = SceneColor(sceneRay, screenDepth);
+        //float3 fogColor = FogColor(fogRay, screenDepth);
+        float fogInten = 0.0f;
+        // final += sceneColor * (1 - fogInten) + fogColor * fogInten;
+        final += sceneColor;
+    }
     
-    Result[id.xy] += float4(final, 1);
-    
-    ResultOut[id.xy] = Result[id.xy] / (_layerCount + 1);
+    Result[pixel] += float4(final, 1);
+    ResultOut[pixel] = Result[pixel] / _sampleCount;
+    ResultOut[pixel] = pow(max(0, ResultOut[pixel]), GAMMA);
 }
 
