@@ -75,29 +75,30 @@ public class RenderWindow : EditorWindow
         skyBoxTexture = EditorGUILayout.ObjectField("SkyBox Texture", skyBoxTexture, typeof(Object), false) as Texture2D;
         SamplePerPixel = EditorGUILayout.IntSlider("SamplePerPixel", SamplePerPixel, 1, 10);
         depth = EditorGUILayout.IntSlider("Depth", depth, 1, 10);
-        resolution = EditorGUILayout.Vector2IntField("Resolution", resolution);
 
         GUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(rayTracingSystem.layerCount.ToString());
-        EditorGUILayout.LabelField(timeAdd.ToString());
-        EditorGUILayout.LabelField(timeMax.ToString());
+        resolution = EditorGUILayout.Vector2IntField("Resolution", resolution);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Sample Count", rayTracingSystem.layerCount.ToString());
         if (GUILayout.Button("Reset"))
         {
             rayTracingSystem.needReset += 1;
         }
-        GUILayout.EndHorizontal();
-
-        if (GUILayout.RepeatButton("Interation", GUILayout.Height(30)))
+        if (GUILayout.RepeatButton("Interation"))
         {
             Interation();
         }
+        GUILayout.EndHorizontal();
+
     }
 
     static UnityEngine.Vector3 positionLast;
     static UnityEngine.Quaternion quaternionLast;
     static Vector3 lastSize;
 
-    static float timeMax = 0.1f;
+    static float timeMax = 0.01f;
     static float timeAdd;
     static void Upadte()
     {
@@ -111,12 +112,12 @@ public class RenderWindow : EditorWindow
             rayTracingSystem.needReset += 1;
         }
 
-        // timeAdd += 1 / 100.0f;
-        // if (timeAdd >= timeMax)
-        // {
-        //     timeAdd = 0;
-        //     Interation();
-        // }
+        timeAdd += 1 / 100.0f;
+        if (timeAdd >= timeMax)
+        {
+            timeAdd = 0;
+            Interation();
+        }
     }
 
     void AngChanged()
@@ -129,8 +130,8 @@ public class RenderWindow : EditorWindow
 
         if (CameraCurrent != null && RayTracingComputeShader != null)
         {
-            if (!CameraCurrent.transform.position.IsApproximate(positionLast, 0.001f)
-                || !CameraCurrent.transform.rotation.IsApproximate(quaternionLast, 0.001f)
+            if (!CameraCurrent.transform.position.IsApproximate(positionLast, 0.01f)
+                || !CameraCurrent.transform.rotation.IsApproximate(quaternionLast)
 
             )
             {
