@@ -15,6 +15,7 @@ SamplerState sampler_SkyboxTexture;
 
 static const float PI = 3.14159265f;
 static const float EPSILON = 1e-8;
+static const float EPSILON2 = 2.3283064365386963e-10f;
 static const float GAMMA = 0.454545f;
 
 float2 _PixelOffset;
