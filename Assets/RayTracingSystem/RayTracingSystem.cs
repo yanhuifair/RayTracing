@@ -118,7 +118,7 @@ public class RayTracingSystem
         }
     }
 
-    public bool needReset = false;
+    public int needReset = 0;
     public RenderTexture ResetRenderTexture()
     {
         if (renderTextureAdd != null) renderTextureAdd.Release();
@@ -539,18 +539,18 @@ public class RayTracingSystem
         {
             if (item.isAnyChanged())
             {
-                needReset = true;
+                needReset += 1;
                 item.ResetChanged();
             }
         }
 
-        if (needReset)
+        if (needReset > 0)
         {
             ResetRenderTexture();
             SetupMaterials();
             SetupScene();
             ResetParameters();
-            needReset = false;
+            needReset = 0;
         }
 
         SetShaderParameters();

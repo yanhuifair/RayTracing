@@ -74,7 +74,7 @@ public class RayTracingWindow : EditorWindow
             if (rayTracingSystem.camera == null && camera.name == "SceneCamera")
             {
                 rayTracingSystem.camera = camera;
-                rayTracingSystem.needReset = true;
+                rayTracingSystem.needReset++;
                 RepaintEditor();
             }
         }
@@ -108,7 +108,7 @@ public class RayTracingWindow : EditorWindow
             if (EditorGUI.EndChangeCheck())
             {
                 rayTracingSystem.camera = cameras[cameraIndex];
-                rayTracingSystem.needReset = true;
+                rayTracingSystem.needReset++;
             }
         }
         GUILayout.EndHorizontal();
@@ -142,7 +142,7 @@ public class RayTracingWindow : EditorWindow
         rayTracingSystem.circleOfConfusion = EditorGUILayout.Slider("Circle", rayTracingSystem.circleOfConfusion, 0, 0.2f);
         if (EditorGUI.EndChangeCheck())
         {
-            rayTracingSystem.needReset = true;
+            rayTracingSystem.needReset++;
         }
         GUILayout.EndHorizontal();
 
@@ -158,7 +158,7 @@ public class RayTracingWindow : EditorWindow
         if (GUILayout.Button("Reset", GUILayout.Width(position.width / 4 - spacing * 2)))
         {
             rayTracingSystem.ResetRenderTexture();
-            rayTracingSystem.needReset = true;
+            rayTracingSystem.needReset++;
             RepaintEditor();
         }
         if (GUILayout.Button($"Interation ({samplePerPixel})", GUILayout.Width(position.width / 4 - spacing * 2)))
@@ -218,7 +218,7 @@ public class RayTracingWindow : EditorWindow
                 lastResolution = new Vector3(resolution.x, resolution.y, 0);
                 rayTracingSystem.resolution = resolution;
                 renderTexture = rayTracingSystem.ResetRenderTexture();
-                rayTracingSystem.needReset = true;
+                rayTracingSystem.needReset++;
                 UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
             }
 
@@ -227,7 +227,7 @@ public class RayTracingWindow : EditorWindow
             {
                 positionLast = rayTracingSystem.camera.transform.position;
                 quaternionLast = rayTracingSystem.camera.transform.rotation;
-                rayTracingSystem.needReset = true;
+                rayTracingSystem.needReset++;
 
                 RepaintEditor();
             }
