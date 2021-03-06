@@ -21,7 +21,7 @@ public class RayTracingEntityEditor : Editor
                     if (rayTracingEntity.mesh)
                     {
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.LabelField($"Triangles:  {rayTracingEntity.mesh.triangles.Length/3}");
+                        EditorGUILayout.LabelField($"Triangles:  {rayTracingEntity.mesh.triangles.Length / 3}");
                         EditorGUILayout.LabelField($"Vertices:  {rayTracingEntity.mesh.vertices.Length}");
                         EditorGUILayout.EndHorizontal();
                     }
@@ -49,16 +49,16 @@ public class RayTracingEntityEditor : Editor
         if (rayTracingEntity.rayTracingMaterial != null)
         {
             EditorGUILayout.BeginVertical();
-            // EditorGUI.BeginChangeCheck();
+            EditorGUI.BeginChangeCheck();
             rayTracingEntity.rayTracingMaterial.albedo = EditorGUILayout.ColorField(new GUIContent("Albedo"), rayTracingEntity.rayTracingMaterial.albedo, true, false, false);
             rayTracingEntity.rayTracingMaterial.specular = EditorGUILayout.ColorField(new GUIContent("Specular"), rayTracingEntity.rayTracingMaterial.specular, true, false, false);
-            rayTracingEntity.rayTracingMaterial.emission = EditorGUILayout.ColorField(new GUIContent("Emission"), rayTracingEntity.rayTracingMaterial.emission, true, false, true);
             rayTracingEntity.rayTracingMaterial.smoothness = EditorGUILayout.Slider("Smoothness", rayTracingEntity.rayTracingMaterial.smoothness, 0, 1);
-            // if (EditorGUI.EndChangeCheck())
-            // {
-            //     rayTracingEntity.attributeChanged = true;
-            //     EditorUtility.SetDirty(rayTracingEntity.rayTracingMaterial);
-            // }
+            rayTracingEntity.rayTracingMaterial.emission = EditorGUILayout.ColorField(new GUIContent("Emission"), rayTracingEntity.rayTracingMaterial.emission, true, false, true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                rayTracingEntity.attributeChanged = true;
+                EditorUtility.SetDirty(rayTracingEntity.rayTracingMaterial);
+            }
             EditorGUILayout.EndVertical();
         }
         if (EditorGUI.EndChangeCheck())

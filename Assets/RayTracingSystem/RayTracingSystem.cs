@@ -15,7 +15,7 @@ public class RayTracingSystem
         {
             if (computeShader == null)
             {
-                ComputeShader[] computeShaders = (ComputeShader[]) Resources.FindObjectsOfTypeAll(typeof(ComputeShader));
+                ComputeShader[] computeShaders = (ComputeShader[])Resources.FindObjectsOfTypeAll(typeof(ComputeShader));
 
                 for (int i = 0; i < computeShaders.Length; i++)
                 {
@@ -43,7 +43,7 @@ public class RayTracingSystem
             {
                 kernalIndex = RayTracingComputeShader?.FindKernel("CSMain");
             }
-            return (int) kernalIndex;
+            return (int)kernalIndex;
         }
     }
     public int samplePerPixel = 1;
@@ -74,7 +74,7 @@ public class RayTracingSystem
         {
             if (renderTextureNormal == null)
             {
-                renderTextureNormal = RenderTexture.GetTemporary((int) resolution.x, (int) resolution.y, 0, RenderTextureFormat.ARGBFloat);
+                renderTextureNormal = RenderTexture.GetTemporary((int)resolution.x, (int)resolution.y, 0, RenderTextureFormat.ARGBFloat);
                 renderTextureNormal.filterMode = FilterMode.Point;
                 renderTextureNormal.enableRandomWrite = true;
                 renderTextureNormal.autoGenerateMips = false;
@@ -91,7 +91,7 @@ public class RayTracingSystem
         {
             if (renderTextureAdd == null)
             {
-                renderTextureAdd = RenderTexture.GetTemporary((int) resolution.x, (int) resolution.y, 0, RenderTextureFormat.ARGBFloat);
+                renderTextureAdd = RenderTexture.GetTemporary((int)resolution.x, (int)resolution.y, 0, RenderTextureFormat.ARGBFloat);
                 renderTextureAdd.filterMode = FilterMode.Point;
                 renderTextureAdd.enableRandomWrite = true;
                 renderTextureAdd.autoGenerateMips = false;
@@ -108,7 +108,7 @@ public class RayTracingSystem
         {
             if (renderTextureOut == null)
             {
-                renderTextureOut = RenderTexture.GetTemporary((int) resolution.x, (int) resolution.y, 0, RenderTextureFormat.ARGBFloat);
+                renderTextureOut = RenderTexture.GetTemporary((int)resolution.x, (int)resolution.y, 0, RenderTextureFormat.ARGBFloat);
                 renderTextureOut.filterMode = FilterMode.Point;
                 renderTextureOut.enableRandomWrite = true;
                 renderTextureOut.autoGenerateMips = false;
@@ -222,9 +222,9 @@ public class RayTracingSystem
                 spheres.Add(new SphereInfo()
                 {
                     position = item.transform.position,
-                        rotation = item.transform.rotation.eulerAngles,
-                        radius = item.radius / 2.0f,
-                        materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
+                    rotation = item.transform.rotation.eulerAngles,
+                    radius = item.radius / 2.0f,
+                    materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
                 });
             }
         }
@@ -236,11 +236,11 @@ public class RayTracingSystem
         {
             stride = sizeof(SphereInfo);
         }
-        sphereBuffer = new ComputeBuffer(spheres.Count == 0 ? CreateEmtpySpheres() : spheres.Count, stride);
+        sphereBuffer = new ComputeBuffer(spheres.Count == 0 ? CreateEmptySpheres() : spheres.Count, stride);
         sphereBuffer.SetData(spheres);
     }
 
-    int CreateEmtpySpheres()
+    int CreateEmptySpheres()
     {
         spheres.Add(new SphereInfo());
         return spheres.Count;
@@ -270,10 +270,10 @@ public class RayTracingSystem
                 boxs.Add(new BoxInfo()
                 {
                     localToWorldMatrix = matrix4X4,
-                        position = item.transform.position,
-                        rotation = item.transform.rotation.eulerAngles,
-                        size = item.boxSize,
-                        materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
+                    position = item.transform.position,
+                    rotation = item.transform.rotation.eulerAngles,
+                    size = item.boxSize,
+                    materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
                 });
             }
         }
@@ -285,10 +285,10 @@ public class RayTracingSystem
         {
             stride = sizeof(BoxInfo);
         }
-        boxBuffer = new ComputeBuffer(boxs.Count == 0 ? CreateEmtpyBoxs() : boxs.Count, stride);
+        boxBuffer = new ComputeBuffer(boxs.Count == 0 ? CreateEmptyBoxs() : boxs.Count, stride);
         boxBuffer.SetData(boxs);
     }
-    int CreateEmtpyBoxs()
+    int CreateEmptyBoxs()
     {
         boxs.Add(new BoxInfo());
         return boxs.Count;
@@ -341,11 +341,11 @@ public class RayTracingSystem
                 _meshObjects.Add(new MeshObject()
                 {
                     position = item.transform.position,
-                        boundsSize = item.bounds.size,
-                        localToWorldMatrix = item.transform.localToWorldMatrix,
-                        indices_offset = firstIndex,
-                        indices_count = indices.Length,
-                        materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
+                    boundsSize = item.bounds.size,
+                    localToWorldMatrix = item.transform.localToWorldMatrix,
+                    indices_offset = firstIndex,
+                    indices_count = indices.Length,
+                    materialIndex = raytracingMaterials.IndexOf(item.rayTracingMaterial),
                 });
             }
         }
@@ -357,8 +357,7 @@ public class RayTracingSystem
             CreateComputeBuffer(ref indexBuffer, _indices, sizeof(int));
         }
     }
-    void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride)
-    where T : struct
+    void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride) where T : struct
     {
         // Do we already have a compute buffer?
         if (buffer != null)
@@ -478,7 +477,7 @@ public class RayTracingSystem
         //Camera
         RayTracingComputeShader.SetFloat("_farClipPlane", camera.farClipPlane);
         RayTracingComputeShader.SetFloat("_focus",
-            focusObject?Vector3.Distance(focusObject.transform.position, camera.transform.position) : focus);
+            focusObject ? Vector3.Distance(focusObject.transform.position, camera.transform.position) : focus);
         RayTracingComputeShader.SetFloat("_circleOfConfusion", circleOfConfusion);
         RayTracingComputeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         RayTracingComputeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
@@ -493,9 +492,9 @@ public class RayTracingSystem
         RayTracingComputeShader.SetInt("_samplePerPixel", samplePerPixel);
 
         //Random
-        SetupRandom(samplePerPixel);
+        // SetupRandom(samplePerPixel);
         SetComputeBuffer("_randomBuffer", randomBuffer);
-        RayTracingComputeShader.SetFloat("_seed", UnityEngine.Random.value);
+        RayTracingComputeShader.SetFloat("_Seed", UnityEngine.Random.value);
         RayTracingComputeShader.SetInt("_dimension", 0);
         RayTracingComputeShader.SetInt("_randomIndex", 0);
         RayTracingComputeShader.SetInt("_hammersleyCurrent", _hammersleyCurrent);

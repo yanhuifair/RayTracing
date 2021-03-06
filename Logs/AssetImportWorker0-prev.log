@@ -1,0 +1,175 @@
+Using pre-set license
+
+ COMMAND LINE ARGUMENTS:
+/Volumes/SamsungT5/Applications/Unitys/2020.2.0f1/Unity.app/Contents/MacOS/Unity
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker0
+-projectPath
+/Volumes/SamsungT5/Projects/RayTracing
+-logFile
+Logs/AssetImportWorker0.log
+-srvPort
+58802
+Successfully changed project path to: /Volumes/SamsungT5/Projects/RayTracing
+/Volumes/SamsungT5/Projects/RayTracing
+Using Asset Import Pipeline V2.
+Refreshing native plugins compatible for Editor in 31.54 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.2.0f1 (3721df5a8b28)
+[Subsystems] Discovering subsystems at path /Volumes/SamsungT5/Applications/Unitys/2020.2.0f1/Unity.app/Contents/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path /Volumes/SamsungT5/Projects/RayTracing/Assets
+GfxDevice: creating device client; threaded=0
+2020-12-18 12:11:39.718 Unity[69213:1696325] iMac preferred device: AMD Radeon Pro 575 (high power)
+2020-12-18 12:11:39.718 Unity[69213:1696325] Metal devices available: 1
+2020-12-18 12:11:39.718 Unity[69213:1696325] 0: AMD Radeon Pro 575 (high power)
+2020-12-18 12:11:39.718 Unity[69213:1696325] Forcing user selected device: AMD Radeon Pro 575 (high power)
+Initializing Metal device caps: AMD Radeon Pro 575
+Initialize mono
+Mono path[0] = '/Volumes/SamsungT5/Applications/Unitys/2020.2.0f1/Unity.app/Contents/Managed'
+Mono path[1] = '/Volumes/SamsungT5/Applications/Unitys/2020.2.0f1/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = '/Volumes/SamsungT5/Applications/Unitys/2020.2.0f1/Unity.app/Contents/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56213
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: /Volumes/SamsungT5/Applications/Unitys/2020.2.0f1/Unity.app/Contents/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll
+Registered in 0.004452 seconds.
+Native extension for OSXStandalone target not found
+Refreshing native plugins compatible for Editor in 26.39 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.345 seconds
+Platform modules already initialized, skipping
+Registering precompiled user dll's ...
+Registered in 0.005753 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for OSXStandalone target not found
+Refreshing native plugins compatible for Editor in 0.29 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.302 seconds
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Launching external process: /Volumes/SamsungT5/Applications/Unitys/2020.2.0f1/Unity.app/Contents/Tools/UnityShaderCompiler
+Launched and connected shader compiler UnityShaderCompiler after 0.02 seconds
+Refreshing native plugins compatible for Editor in 0.27 ms, found 1 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1115 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 132.1 MB.
+System memory in use after: 132.1 MB.
+
+Unloading 29 unused Assets to reduce memory usage. Loaded Objects now: 1598.
+Total: 15.817181 ms (FindLiveObjects: 0.190680 ms CreateObjectMapping: 0.044417 ms MarkObjects: 15.516942 ms  DeleteObjects: 0.063869 ms)
+
+========================================================================
+Received Import Request.
+  path: Assets/RayTracingSystem/AddShader.shader
+  artifactKey: Guid(1d97b2ae7d3b04e6e9680614a2ee8bac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/AddShader.shader using Guid(1d97b2ae7d3b04e6e9680614a2ee8bac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2cd772f492e86ba9b4a4ddaf079721d7') in 0.350282 seconds
+  Import took 0.351867 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000282 seconds.
+  path: Assets/RayTracingSystem/RayTracingComputeShader.compute
+  artifactKey: Guid(3433e7b6752fc4b57a6d2e4b5210feec) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingComputeShader.compute using Guid(3433e7b6752fc4b57a6d2e4b5210feec) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'bbb9351b78e10862bbd2bd3aab8a3871') in 0.297674 seconds
+  Import took 0.299121 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000260 seconds.
+  path: Assets/RayTracingSystem/ColorExtend.cs
+  artifactKey: Guid(44925424864184915aabdbf4881303eb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/ColorExtend.cs using Guid(44925424864184915aabdbf4881303eb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '809d1fc6afbcad252636f77b466166f7') in 0.428359 seconds
+  Import took 0.429937 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000277 seconds.
+  path: Assets/RayTracingSystem/RayTracingCamera.cs
+  artifactKey: Guid(eb2f2dd13e3b547dfb04da35718d5fdb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingCamera.cs using Guid(eb2f2dd13e3b547dfb04da35718d5fdb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c1e7455f2f0ba0c4876c454998ccf1e1') in 0.001338 seconds
+  Import took 0.002786 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.391078 seconds.
+  path: Assets/RayTracingSystem/RayTracingEntity.cs
+  artifactKey: Guid(6be2fd4c5b57849f88100262b87ec881) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingEntity.cs using Guid(6be2fd4c5b57849f88100262b87ec881) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '880db9813343409c348786c9faf8f717') in 0.004447 seconds
+  Import took 0.006317 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.001060 seconds.
+  path: Assets/RayTracingSystem/RayTracingEntity.cs
+  artifactKey: Guid(6be2fd4c5b57849f88100262b87ec881) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingEntity.cs using Guid(6be2fd4c5b57849f88100262b87ec881) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '880db9813343409c348786c9faf8f717') in 0.001786 seconds
+  Import took 0.003825 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.535308 seconds.
+  path: Assets/RayTracingSystem/RayTracingEntityEditor.cs
+  artifactKey: Guid(8d46a5619f8f54bc49687434e86636cc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingEntityEditor.cs using Guid(8d46a5619f8f54bc49687434e86636cc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '542e8fe8ac0fa5942bb68df0f120236f') in 0.004472 seconds
+  Import took 0.006309 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.459235 seconds.
+  path: Assets/RayTracingSystem/RayTracingMaterial.cs
+  artifactKey: Guid(068c4b6aea34b450fadce611e044691e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingMaterial.cs using Guid(068c4b6aea34b450fadce611e044691e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '78b7fb40b24b3a73a0d2b289560199e3') in 0.004288 seconds
+  Import took 0.006596 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.623021 seconds.
+  path: Assets/RayTracingSystem/RayTracingSystem.cs
+  artifactKey: Guid(7dd9ec5fcb3be4511969cb203a9734da) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingSystem.cs using Guid(7dd9ec5fcb3be4511969cb203a9734da) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a97c57b3fad002dba9b6c2b1ae86b513') in 0.004361 seconds
+  Import took 0.006128 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000572 seconds.
+  path: Assets/RayTracingSystem/RayTracingSystem.cs
+  artifactKey: Guid(7dd9ec5fcb3be4511969cb203a9734da) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingSystem.cs using Guid(7dd9ec5fcb3be4511969cb203a9734da) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a97c57b3fad002dba9b6c2b1ae86b513') in 0.001791 seconds
+  Import took 0.004244 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.798349 seconds.
+  path: Assets/RayTracingSystem/RayTracingWindow.cs
+  artifactKey: Guid(6773e2480e61aca42a294a7c96605f6f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/RayTracingWindow.cs using Guid(6773e2480e61aca42a294a7c96605f6f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fefca36fbfbe56f162c9dfdc32096261') in 0.004286 seconds
+  Import took 0.005971 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.201634 seconds.
+  path: Assets/RayTracingSystem/Random.compute
+  artifactKey: Guid(bab547497a3d843b68f90185f4cb913c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/Random.compute using Guid(bab547497a3d843b68f90185f4cb913c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c9ecd66167925968d02e321c866eef84') in 0.004634 seconds
+  Import took 0.006817 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.058566 seconds.
+  path: Assets/RayTracingSystem/Random.compute
+  artifactKey: Guid(bab547497a3d843b68f90185f4cb913c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/RayTracingSystem/Random.compute using Guid(bab547497a3d843b68f90185f4cb913c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c9ecd66167925968d02e321c866eef84') in 0.004851 seconds
+  Import took 0.007215 seconds .
+
